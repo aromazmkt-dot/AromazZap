@@ -573,10 +573,10 @@ svg{flex-shrink:0;}
     </nav>
     <div class="sidebar-footer">
       <div class="user-card">
-        <div class="user-avatar">MB</div>
+        <div class="user-avatar" id="sidebar-user-avatar">MB</div>
         <div class="user-info">
-          <div class="user-name">Marco Baeza</div>
-          <div class="user-role" data-i18n="role.gm">General Manager</div>
+          <div class="user-name" id="sidebar-user-name">Marco Baeza</div>
+          <div class="user-role" id="sidebar-user-role">Gerente General</div>
         </div>
       </div>
     </div>
@@ -635,6 +635,10 @@ svg{flex-shrink:0;}
 
     <!-- GM DASHBOARD -->
     <div class="view active page-content" id="view-gm-dashboard">
+      <div class="greeting-strip" style="margin-bottom:16px">
+        <div class="greeting-title" id="gm-greeting" style="font-size:20px"></div>
+        <div class="greeting-sub" id="gm-greeting-sub" style="font-size:13px;color:var(--text-subtle)"></div>
+      </div>
       <div class="hero-panel" id="hero-panel"></div>
       <div class="section-header">
         <span class="section-title" data-i18n="section.company_kpis">KPIs de la Compañía &mdash; Semana 21</span>
@@ -1161,7 +1165,31 @@ const INSTALLER_ERRORS = [
 const COND_COLORS = { danger:'var(--cond-danger)', emergency:'var(--cond-emergency)', normal:'var(--cond-normal)', affluence:'var(--cond-affluence)', power:'var(--cond-power)' };
 
 /* ── I18N ── */
-let LANG = 'es';
+/* ── CURRENT USER (simulates authenticated session) ── */
+const CURRENT_USER = {
+  name: 'Marco Baeza',
+  firstName: 'Marco',
+  initials: 'MB',
+  role: 'gm',
+  email: 'marco@aromazhome.com',
+};
+
+/* ── GEO LANGUAGE DETECTION ── */
+function detectLang() {
+  const saved = localStorage.getItem('aromaz_lang');
+  if (saved) return saved;
+  const nav = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+  const esLocales = ['es','es-cl','es-ar','es-mx','es-co','es-pe','es-uy','es-ve','es-ec','es-bo','es-py'];
+  const isSpanish = esLocales.some(l => nav === l || nav.startsWith(l.split('-')[0]+'-'));
+  // Also use timezone as secondary signal
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (!isSpanish && (tz.includes('America/Santiago') || tz.includes('America/Buenos') || tz.includes('America/Bogota') || tz.includes('America/Lima'))) return 'es';
+  } catch(e){}
+  return isSpanish ? 'es' : 'en';
+}
+
+let LANG = 'es'; // will be set on DOMContentLoaded
 const T = {
   en: {
     'nav.dashboard':'Dashboard','nav.sales':'Sales','nav.my_dashboard':'My Dashboard',
@@ -1745,7 +1773,7 @@ function renderVendorDashboard() {
     banner.innerHTML=`<div style="display:flex;align-items:center;gap:12px">
       <div style="width:10px;height:10px;border-radius:50%;background:var(--cond-${overallCond});flex-shrink:0"></div>
       <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text-primary)">${firstName} Smith &mdash; ${condBadge(overallCond)}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary)">${me.name} &mdash; ${condBadge(overallCond)}</div>
         <div style="font-size:12px;color:var(--text-subtle);margin-top:2px">${statusMsg}</div>
       </div>
     </div>`;
@@ -1859,13 +1887,26 @@ function toggleTheme(){
 /* ── LANG ── */
 function setLang(lang){
   LANG=lang;
+  localStorage.setItem('aromaz_lang', lang);
   document.getElementById('lang-en').classList.toggle('active',lang==='en');
   document.getElementById('lang-es').classList.toggle('active',lang==='es');
   const sph=document.getElementById('search-ph');
   if(sph)sph.textContent=lang==='es'?'Buscar métricas, reportes...':'Search metrics, reports...';
+  // Update user role label with real user
+  const roleEl=document.getElementById('sidebar-user-role');
+  if(roleEl)roleEl.textContent=lang==='es'?'Gerente General':'General Manager';
+  // Update GM dashboard greeting
+  const gmGreet=document.getElementById('gm-greeting');
+  if(gmGreet){
+    const hour=new Date().getHours();
+    const salute=lang==='es'
+      ? (hour<12?'Buenos días':hour<18?'Buenas tardes':'Buenas noches')
+      : (hour<12?'Good morning':hour<18?'Good afternoon':'Good evening');
+    gmGreet.textContent=`${salute}, ${CURRENT_USER.firstName}.`;
+  }
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k=el.getAttribute('data-i18n');
-    if(T[lang][k])el.textContent=T[lang][k];
+    if(T[lang]&&T[lang][k])el.textContent=T[lang][k];
   });
   renderAll();
 }
@@ -2199,8 +2240,25 @@ function renderCX() {
   if(t3) t3.textContent = isEs ? 'Ranking Errores por Instalador' : 'Installer Error Ranking';
 }
 
+/* ── GM GREETING ── */
+function renderGMGreeting(){
+  const gmGreet=document.getElementById('gm-greeting');
+  const gmSub=document.getElementById('gm-greeting-sub');
+  if(!gmGreet)return;
+  const hour=new Date().getHours();
+  const salute=LANG==='es'
+    ?(hour<12?'Buenos días':hour<18?'Buenas tardes':'Buenas noches')
+    :(hour<12?'Good morning':hour<18?'Good afternoon':'Good evening');
+  gmGreet.textContent=`${salute}, ${CURRENT_USER.firstName}.`;
+  const today=new Date().toLocaleDateString(LANG==='es'?'es-CL':'en-US',{weekday:'long',day:'numeric',month:'long'});
+  if(gmSub)gmSub.textContent=LANG==='es'
+    ?`Semana 21 · ${today.charAt(0).toUpperCase()+today.slice(1)}`
+    :`Week 21 · ${today.charAt(0).toUpperCase()+today.slice(1)}`;
+}
+
 /* ── RENDER ALL ── */
 function renderAll(){
+  renderGMGreeting();
   renderHeroPanel();
   renderAsymKpis();
   renderDeptTable();
@@ -2224,10 +2282,22 @@ function renderAll(){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
+  // Apply real user name to sidebar
+  const nameEl = document.getElementById('sidebar-user-name');
+  const roleEl = document.getElementById('sidebar-user-role');
+  const avatarEl = document.getElementById('sidebar-user-avatar');
+  if(nameEl) nameEl.textContent = CURRENT_USER.name;
+  if(avatarEl) avatarEl.textContent = CURRENT_USER.initials;
+
+  // Detect language from browser locale / timezone
+  const detectedLang = detectLang();
+  LANG = detectedLang;
+  if(roleEl) roleEl.textContent = detectedLang === 'es' ? 'Gerente General' : 'General Manager';
+
   renderAll();
   let rt;
   window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(drawSalesChart,100);});
-  setLang('es');
+  setLang(detectedLang);
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 </script>
