@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aromaz Metrics Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand-blue:#1E7FCC; --brand-red:#E11D24;
+  --cond-danger:#B91C1C; --cond-emergency:#EA580C; --cond-normal:#16A34A; --cond-affluence:#0284C7; --cond-power:#7C3AED;
+  --cond-danger-bg:rgba(185,28,28,0.12); --cond-emergency-bg:rgba(234,88,12,0.12);
+  --cond-normal-bg:rgba(22,163,74,0.12); --cond-affluence-bg:rgba(2,132,199,0.12); --cond-power-bg:rgba(124,58,237,0.12);
+  --dur-fast:150ms; --dur-normal:250ms; --ease:cubic-bezier(0.4,0,0.2,1);
+  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-full:9999px;
+  --sidebar-w:240px; --topbar-h:60px;
+}
+[data-theme="light"] {
+  --bg-canvas:#F8FAFC; --bg-primary:#FFFFFF; --bg-secondary:#F1F5F9; --bg-tertiary:#E2E8F0;
+  --border-subtle:#E2E8F0; --border-default:#CBD5E1; --border-focus:#1E7FCC;
+  --text-primary:#0F172A; --text-secondary:#334155; --text-subtle:#64748B; --text-disabled:#94A3B8; --text-brand:#155A91;
+  --shadow-1:0 1px 3px rgba(15,23,42,0.08); --shadow-2:0 4px 12px rgba(15,23,42,0.10); --shadow-3:0 8px 24px rgba(15,23,42,0.12);
+  --sidebar-bg:#FFFFFF; --topbar-bg:#FFFFFF; --sidebar-item-active-bg:#F1F5F9; --sidebar-item-hover-bg:#F8FAFC;
+  --cond-danger:#B91C1C; --cond-emergency:#EA580C; --cond-normal:#16A34A; --cond-affluence:#0284C7; --cond-power:#7C3AED;
+}
+[data-theme="dark"] {
+  --bg-canvas:#020617; --bg-primary:#0F172A; --bg-secondary:#1E293B; --bg-tertiary:#334155;
+  --border-subtle:#1E293B; --border-default:#334155; --border-focus:#5FA3DA;
+  --text-primary:#F8FAFC; --text-secondary:#CBD5E1; --text-subtle:#94A3B8; --text-disabled:#475569; --text-brand:#5FA3DA;
+  --shadow-1:0 1px 3px rgba(0,0,0,0.4); --shadow-2:0 4px 12px rgba(0,0,0,0.5); --shadow-3:0 8px 24px rgba(0,0,0,0.6);
+  --sidebar-bg:#0F172A; --topbar-bg:#0F172A; --sidebar-item-active-bg:#1E293B; --sidebar-item-hover-bg:#1a2535;
+  --cond-danger:#F87171; --cond-emergency:#FB923C; --cond-normal:#4ADE80; --cond-affluence:#38BDF8; --cond-power:#A78BFA;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-canvas);color:var(--text-primary);min-height:100vh;overflow-x:hidden;transition:background var(--dur-normal),color var(--dur-normal);}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,textarea,select{font-family:inherit;}
+a{color:inherit;text-decoration:none;}
+svg{flex-shrink:0;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:width var(--dur-normal);overflow:hidden;}
+.sidebar.collapsed{width:64px;}
+.sidebar-header{height:var(--topbar-h);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border-subtle);gap:10px;flex-shrink:0;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;overflow:hidden;min-width:0;}
+.sidebar-logo-text{font-size:13px;font-weight:700;color:var(--text-primary);white-space:nowrap;opacity:1;transition:opacity var(--dur-fast);line-height:1.2;}
+.sidebar-logo-sub{font-size:10px;font-weight:500;color:var(--text-subtle);white-space:nowrap;letter-spacing:0.04em;text-transform:uppercase;}
+.sidebar.collapsed .sidebar-logo-text,.sidebar.collapsed .sidebar-logo-sub{opacity:0;width:0;}
+.sidebar-collapse-btn{margin-left:auto;width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--text-subtle);flex-shrink:0;transition:background var(--dur-fast),color var(--dur-fast);}
+.sidebar-collapse-btn:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0;}
+.sidebar-section-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-disabled);padding:12px 18px 4px;white-space:nowrap;transition:opacity var(--dur-fast);}
+.sidebar.collapsed .sidebar-section-label{opacity:0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;border-radius:var(--r-md);margin:1px 8px;cursor:pointer;color:var(--text-secondary);font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;transition:background var(--dur-fast),color var(--dur-fast);border-left:3px solid transparent;}
+.nav-item:hover{background:var(--sidebar-item-hover-bg);color:var(--text-primary);}
+.nav-item.active{background:var(--sidebar-item-active-bg);color:var(--brand-blue);border-left-color:var(--brand-blue);}
+.nav-item .nav-icon{width:18px;height:18px;flex-shrink:0;}
+.nav-item .nav-label{transition:opacity var(--dur-fast);}
+.sidebar.collapsed .nav-item .nav-label{opacity:0;width:0;}
+.nav-item .nav-badge{margin-left:auto;background:var(--brand-red);color:white;font-size:10px;font-weight:700;border-radius:var(--r-full);padding:1px 6px;min-width:18px;text-align:center;transition:opacity var(--dur-fast);}
+.sidebar.collapsed .nav-item .nav-badge{opacity:0;}
+.sidebar-footer{padding:12px 8px;border-top:1px solid var(--border-subtle);flex-shrink:0;}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--r-md);cursor:pointer;overflow:hidden;transition:background var(--dur-fast);}
+.user-card:hover{background:var(--bg-secondary);}
+.user-avatar{width:32px;height:32px;border-radius:var(--r-full);background:var(--brand-blue);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.user-info{overflow:hidden;}
+.user-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;}
+.user-role{font-size:11px;color:var(--text-subtle);white-space:nowrap;}
+.sidebar.collapsed .user-info{opacity:0;width:0;}
+.sidebar.collapsed .logo-full{opacity:0;width:0;}
+.logo-full{max-width:130px;}
+
+/* ── TOPBAR SEARCH ── */
+.topbar-search{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--r-md);font-size:13px;color:var(--text-subtle);cursor:pointer;min-width:200px;transition:border-color var(--dur-fast);}
+.topbar-search:hover{border-color:var(--border-default);}
+.topbar-search kbd{margin-left:auto;font-size:10px;background:var(--bg-tertiary);border:1px solid var(--border-subtle);border-radius:3px;padding:1px 5px;font-family:'JetBrains Mono',monospace;color:var(--text-disabled);}
+.role-switch{display:flex;align-items:center;background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--r-md);overflow:hidden;font-size:12px;font-weight:700;}
+.role-btn{padding:5px 10px;color:var(--text-subtle);transition:background var(--dur-fast),color var(--dur-fast);}
+.role-btn.active{background:var(--brand-blue);color:white;}
+.role-btn:hover:not(.active){background:var(--bg-tertiary);color:var(--text-primary);}
+
+/* ── HERO PANEL ── */
+.hero-panel{display:grid;grid-template-columns:200px 1fr 340px;gap:0;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);margin-bottom:24px;box-shadow:var(--shadow-1);overflow:hidden;}
+@media(max-width:1200px){.hero-panel{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){.hero-panel{grid-template-columns:1fr;}}
+.hero-panel-score{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;border-right:1px solid var(--border-subtle);}
+.hero-donut{position:relative;width:120px;height:120px;margin-bottom:12px;}
+.hero-donut-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.hero-donut-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--text-primary);line-height:1;}
+.hero-donut-unit{font-size:11px;color:var(--text-subtle);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;}
+.hero-score-sub{font-size:12px;color:var(--text-subtle);text-align:center;line-height:1.4;}
+.hero-score-sub strong{color:var(--cond-normal);font-weight:700;}
+
+.hero-panel-dist{padding:20px 24px;border-right:1px solid var(--border-subtle);}
+.hero-dist-title{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:12px;}
+.hero-dist-bar{display:flex;height:8px;border-radius:var(--r-full);overflow:hidden;margin-bottom:14px;gap:2px;}
+.hero-dist-seg{border-radius:2px;transition:flex var(--dur-normal);}
+.hero-dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:12px;}
+.hero-dist-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;}
+.hero-dist-cond{display:flex;align-items:center;gap:6px;color:var(--text-secondary);}
+.hero-dist-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-variant-numeric:tabular-nums;}
+.hero-dist-summary{font-size:12px;color:var(--text-subtle);line-height:1.5;}
+
+.hero-panel-alert{padding:20px;display:flex;flex-direction:column;justify-content:space-between;background:var(--bg-primary);}
+.hero-alert-tag{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;}
+.hero-alert-dot{width:7px;height:7px;border-radius:50%;background:var(--cond-danger);animation:pulse 1.8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-alert-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.45;margin-bottom:14px;}
+.hero-alert-text span{color:var(--cond-danger);}
+.hero-alert-person{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.hero-alert-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+.hero-alert-name{font-size:13px;font-weight:700;color:var(--text-primary);}
+.hero-alert-sub{font-size:11px;color:var(--text-subtle);}
+.hero-alert-cta{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--brand-red);color:white;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;transition:opacity var(--dur-fast);}
+.hero-alert-cta:hover{opacity:0.88;}
+
+/* ── ASYMMETRIC KPI ROW ── */
+.kpi-row-asym{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:1200px){.kpi-row-asym{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.kpi-row-asym{grid-template-columns:1fr;}}
+.kpi-hero-card{background:var(--bg-primary);border:1.5px solid var(--border-subtle);border-radius:var(--r-lg);padding:20px 22px 16px;box-shadow:var(--shadow-1);position:relative;overflow:hidden;cursor:pointer;transition:box-shadow var(--dur-fast),border-color var(--dur-fast);display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;}
+.kpi-hero-card:hover{box-shadow:var(--shadow-2);}
+.kpi-hero-card.danger{border-color:var(--cond-danger);}
+.kpi-hero-card.emergency{border-color:var(--cond-emergency);}
+.kpi-hero-card.normal{border-color:var(--cond-normal);}
+.kpi-hero-card.affluence{border-color:var(--cond-affluence);}
+.kpi-hero-card.power{border-color:var(--cond-power);}
+.kpi-hero-left{}
+.kpi-hero-value{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;color:var(--text-primary);line-height:1;margin-bottom:8px;font-variant-numeric:tabular-nums;}
+.kpi-hero-delta{font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;}
+.kpi-hero-delta.up{color:var(--cond-normal);}
+.kpi-hero-delta.down{color:var(--cond-danger);}
+.kpi-hero-delta.flat{color:var(--text-subtle);}
+.kpi-hero-vstext{color:var(--text-subtle);font-size:12px;font-weight:400;}
+.kpi-hero-progress{height:5px;background:var(--bg-tertiary);border-radius:var(--r-full);margin-bottom:6px;overflow:hidden;}
+.kpi-hero-right{display:flex;flex-direction:column;justify-content:space-between;}
+.kpi-hero-chart{flex:1;min-height:80px;display:flex;align-items:flex-end;}
+.kpi-hero-chart svg{width:100%;height:100%;display:block;}
+.kpi-hero-annotation{font-size:11px;font-weight:700;letter-spacing:0.05em;text-align:right;margin-top:6px;}
+
+.topbar{position:fixed;top:0;left:calc(var(--sidebar-w) + 10px);right:0;height:var(--topbar-h);background:var(--topbar-bg);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 24px;gap:12px;z-index:90;transition:left var(--dur-normal),background var(--dur-normal);}
+.sidebar.collapsed ~ .main-area .topbar{left:calc(64px + 10px);}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-subtle);flex:1;}
+.breadcrumb-current{color:var(--text-primary);font-weight:600;}
+.topbar-spacer{flex:1;}
+.period-select{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--text-primary);cursor:pointer;transition:border-color var(--dur-fast);white-space:nowrap;}
+.period-select:hover{border-color:var(--border-default);}
+.topbar-btn{width:34px;height:34px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--text-subtle);position:relative;transition:background var(--dur-fast),color var(--dur-fast);}
+.topbar-btn:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.lang-toggle{display:flex;align-items:center;background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--r-md);overflow:hidden;font-size:12px;font-weight:600;}
+.lang-btn{padding:5px 9px;color:var(--text-subtle);transition:background var(--dur-fast),color var(--dur-fast);}
+.lang-btn.active{background:var(--brand-blue);color:white;}
+.lang-btn:hover:not(.active){background:var(--bg-tertiary);color:var(--text-primary);}
+.notif-badge{position:absolute;top:4px;right:4px;width:16px;height:16px;background:var(--brand-red);color:white;font-size:9px;font-weight:700;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;border:2px solid var(--topbar-bg);}
+
+.main-area{flex:1;margin-left:calc(var(--sidebar-w) + 10px);padding-top:var(--topbar-h);transition:margin-left var(--dur-normal);min-width:0;}
+.sidebar.collapsed ~ .main-area{margin-left:calc(64px + 10px);}
+.view{display:none;}
+.view.active{display:block;}
+.page-content{padding:24px;max-width:1440px;}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-subtle);}
+.section-link{font-size:12px;color:var(--text-brand);font-weight:500;cursor:pointer;}
+.section-link:hover{text-decoration:underline;}
+
+.kpi-grid-8{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:1100px){.kpi-grid-8{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.kpi-grid-8{grid-template-columns:1fr;}}
+.kpi-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:900px){.kpi-grid-3{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.kpi-grid-3{grid-template-columns:1fr;}}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.kpi-grid{grid-template-columns:1fr;}}
+
+.kpi-card{background:var(--bg-primary);border:1.5px solid var(--border-subtle);border-radius:var(--r-lg);padding:16px 18px 14px;box-shadow:var(--shadow-1);position:relative;overflow:hidden;cursor:pointer;transition:box-shadow var(--dur-fast),transform var(--dur-fast),border-color var(--dur-fast);}
+.kpi-card:hover{box-shadow:var(--shadow-2);transform:translateY(-1px);}
+.kpi-card.danger{border-color:var(--cond-danger);}
+.kpi-card.emergency{border-color:var(--cond-emergency);}
+.kpi-card.normal{border-color:var(--cond-normal);}
+.kpi-card.affluence{border-color:var(--cond-affluence);}
+.kpi-card.power{border-color:var(--cond-power);}
+.kpi-sparkline{height:40px;margin-bottom:8px;overflow:hidden;}
+.kpi-sparkline svg{width:100%;height:100%;display:block;}
+.kpi-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:6px;}
+.kpi-value-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;}
+.kpi-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--text-primary);line-height:1;font-variant-numeric:tabular-nums;}
+.inline-delta{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px;}
+.inline-delta.up{color:var(--cond-normal);}
+.inline-delta.down{color:var(--cond-danger);}
+.inline-delta.flat{color:var(--text-subtle);}
+.kpi-progress{height:4px;background:var(--bg-tertiary);border-radius:var(--r-full);margin-bottom:6px;overflow:hidden;}
+.kpi-progress-bar{height:100%;border-radius:var(--r-full);transition:width 600ms var(--ease);}
+.kpi-card.danger .kpi-progress-bar{background:var(--cond-danger);}
+.kpi-card.emergency .kpi-progress-bar{background:var(--cond-emergency);}
+.kpi-card.normal .kpi-progress-bar{background:var(--cond-normal);}
+.kpi-card.affluence .kpi-progress-bar{background:var(--cond-affluence);}
+.kpi-card.power .kpi-progress-bar{background:var(--cond-power);}
+.kpi-meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-subtle);margin-bottom:10px;}
+.kpi-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border-subtle);}
+.kpi-timestamp{font-size:11px;color:var(--text-disabled);}
+.kpi-footnote{font-size:10px;color:var(--text-disabled);margin-top:3px;}
+
+.cond-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:var(--r-sm);font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;}
+.cond-badge.danger{background:var(--cond-danger-bg);color:var(--cond-danger);}
+.cond-badge.emergency{background:var(--cond-emergency-bg);color:var(--cond-emergency);}
+.cond-badge.normal{background:var(--cond-normal-bg);color:var(--cond-normal);}
+.cond-badge.affluence{background:var(--cond-affluence-bg);color:var(--cond-affluence);}
+.cond-badge.power{background:var(--cond-power-bg);color:var(--cond-power);}
+.cond-badge svg{width:11px;height:11px;}
+
+.pulse-strip{display:flex;align-items:center;gap:14px;background:var(--bg-primary);border:1px solid var(--border-subtle);border-left:4px solid var(--cond-normal);border-radius:var(--r-lg);padding:14px 20px;margin-bottom:20px;box-shadow:var(--shadow-1);}
+.pulse-strip .status-dot{width:10px;height:10px;border-radius:var(--r-full);background:var(--cond-normal);flex-shrink:0;}
+.pulse-strip .pulse-title{font-size:14px;font-weight:700;color:var(--text-primary);}
+.pulse-strip .pulse-meta{font-size:12px;color:var(--text-subtle);margin-top:2px;}
+.hero-cta{padding:5px 12px;border-radius:var(--r-md);font-size:12px;font-weight:600;background:var(--brand-red);color:white;transition:opacity var(--dur-fast);margin-left:auto;flex-shrink:0;}
+.hero-cta:hover{opacity:0.85;}
+.status-banner{background:var(--bg-primary);border:1px solid var(--border-subtle);border-left:4px solid var(--cond-normal);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow-1);}
+
+.chart-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);box-shadow:var(--shadow-1);overflow:hidden;}
+.chart-header{padding:16px 20px 12px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:flex-start;justify-content:space-between;}
+.chart-title{font-size:14px;font-weight:600;color:var(--text-primary);}
+.chart-subtitle{font-size:12px;color:var(--text-subtle);margin-top:2px;}
+.chart-body{padding:16px 20px 10px;}
+.chart-legend{display:flex;gap:16px;align-items:center;padding:10px 20px 14px;font-size:11px;color:var(--text-subtle);font-weight:500;}
+.legend-item{display:flex;align-items:center;gap:5px;}
+.legend-dot{width:8px;height:8px;border-radius:var(--r-full);}
+.legend-line{width:16px;height:2px;border-top:2px dashed var(--text-subtle);}
+.two-col-grid{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:24px;}
+@media(max-width:1100px){.two-col-grid{grid-template-columns:1fr;}}
+
+.data-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);box-shadow:var(--shadow-1);overflow:hidden;}
+.data-card-header{padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;}
+.data-card-title{font-size:14px;font-weight:600;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-subtle);text-align:left;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.data-table td{padding:10px 14px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border-subtle);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--bg-secondary);}
+.data-table .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;text-align:right;color:var(--text-primary);font-weight:500;}
+.dept-name{font-weight:600;color:var(--text-primary);}
+.dept-trend{width:64px;height:24px;overflow:hidden;display:inline-block;vertical-align:middle;}
+.dept-trend svg{width:100%;height:100%;display:block;}
+.table-progress-wrap{min-width:90px;}
+.table-progress-track{height:5px;background:var(--bg-tertiary);border-radius:var(--r-full);overflow:hidden;}
+.table-progress-fill{height:100%;border-radius:var(--r-full);}
+
+.inbox-panel{display:flex;flex-direction:column;}
+.inbox-item{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background var(--dur-fast);}
+.inbox-item:last-child{border-bottom:none;}
+.inbox-item:hover{background:var(--bg-secondary);}
+.inbox-cond-dot{width:8px;height:8px;border-radius:var(--r-full);margin-top:4px;flex-shrink:0;}
+.inbox-item-body{flex:1;min-width:0;}
+.inbox-item-title{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px;}
+.inbox-item-sub{font-size:12px;color:var(--text-subtle);}
+.inbox-item-meta{font-size:11px;color:var(--text-disabled);margin-top:4px;}
+.inbox-item-action{font-size:11px;font-weight:600;color:var(--brand-blue);padding:3px 8px;border-radius:var(--r-sm);border:1px solid var(--border-subtle);white-space:nowrap;flex-shrink:0;margin-top:2px;transition:background var(--dur-fast);}
+.inbox-item-action:hover{background:var(--bg-secondary);border-color:var(--brand-blue);}
+
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--r-full);border:1px solid var(--border-subtle);background:var(--bg-primary);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:background var(--dur-fast),border-color var(--dur-fast);}
+.filter-chip:hover{background:var(--bg-secondary);}
+.filter-chip.active{background:var(--bg-secondary);border-color:var(--border-default);color:var(--text-primary);}
+.filter-chip-count{background:var(--bg-tertiary);border-radius:var(--r-full);padding:0 5px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-subtle);}
+
+.inbox-list-view{display:flex;flex-direction:column;}
+.inbox-row{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:8px;cursor:pointer;transition:box-shadow var(--dur-fast),transform var(--dur-fast);}
+.inbox-row:hover{box-shadow:var(--shadow-2);transform:translateY(-1px);}
+.inbox-row-dot{width:10px;height:10px;border-radius:var(--r-full);flex-shrink:0;}
+.inbox-row-body{flex:1;min-width:0;}
+.inbox-row-title{font-size:14px;font-weight:600;color:var(--text-primary);}
+.inbox-row-sub{font-size:12px;color:var(--text-subtle);margin-top:2px;}
+.inbox-row-time{font-size:11px;color:var(--text-disabled);white-space:nowrap;flex-shrink:0;}
+.inbox-row-avatar{width:36px;height:36px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity var(--dur-normal);}
+.drawer-backdrop.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100vw;background:var(--bg-primary);border-left:1px solid var(--border-subtle);box-shadow:var(--shadow-3);z-index:210;display:flex;flex-direction:column;transform:translateX(100%);transition:transform var(--dur-normal) var(--ease);overflow:hidden;}
+.drawer.open{transform:translateX(0);}
+.drawer-header{padding:20px 24px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:flex-start;gap:12px;flex-shrink:0;}
+.drawer-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.drawer-footer{padding:14px 24px;border-top:1px solid var(--border-subtle);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;background:var(--bg-primary);}
+.drawer-section{background:var(--bg-secondary);border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px;}
+.drawer-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-subtle);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+.cond-scale{display:flex;gap:3px;margin-bottom:4px;}
+.cond-scale .seg{height:8px;flex:1;border-radius:2px;opacity:0.3;transition:opacity 0.2s;}
+.cond-scale .seg.active{opacity:1;}
+.cond-scale .seg.danger{background:var(--cond-danger);}
+.cond-scale .seg.emergency{background:var(--cond-emergency);}
+.cond-scale .seg.normal{background:var(--cond-normal);}
+.cond-scale .seg.affluence{background:var(--cond-affluence);}
+.cond-scale .seg.power{background:var(--cond-power);}
+.cond-scale-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-subtle);font-family:'JetBrains Mono',monospace;margin-top:4px;}
+
+.stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.stat-block{background:var(--bg-secondary);border-radius:var(--r-md);padding:12px 14px;border-left:3px solid transparent;}
+.stat-block.cond-colored{border-left-color:var(--cond-emergency);}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-subtle);margin-bottom:6px;}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;}
+.stat-sub{font-size:11px;color:var(--text-subtle);margin-top:2px;}
+
+.action-step{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg-primary);border-radius:var(--r-md);border-left:3px solid var(--cond-emergency);margin-bottom:8px;}
+.action-step:last-child{margin-bottom:0;}
+.step-verb{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
+.step-body{font-size:13px;color:var(--text-secondary);line-height:1.5;}
+.step-num{width:22px;height:22px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;margin-top:1px;}
+
+.vendor-row-avatar{display:flex;align-items:center;gap:10px;}
+.avatar-chip{width:28px;height:28px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;}
+
+.greeting-strip{margin-bottom:20px;}
+.greeting-title{font-size:22px;font-weight:700;color:var(--text-primary);}
+.greeting-sub{font-size:14px;color:var(--text-subtle);margin-top:2px;}
+.plan-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-1);margin-bottom:16px;}
+.plan-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-subtle);font-size:13px;color:var(--text-secondary);}
+.plan-item:last-child{border-bottom:none;}
+.plan-check{width:16px;height:16px;border-radius:var(--r-sm);border:2px solid var(--border-default);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.plan-check.done{background:var(--cond-normal);border-color:var(--cond-normal);}
+.plan-check.done::after{content:'\2713';color:white;font-size:10px;font-weight:700;}
+.leaderboard-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-1);}
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border-subtle);transition:background var(--dur-fast);}
+.lb-row:last-child{border-bottom:none;}
+.lb-row:hover{background:var(--bg-secondary);}
+.lb-row.you{background:rgba(30,127,204,0.06);}
+.lb-pos{width:20px;font-size:13px;font-weight:700;color:var(--text-subtle);text-align:center;flex-shrink:0;}
+.lb-pos.gold{color:#F59E0B;} .lb-pos.silver{color:#94A3B8;} .lb-pos.bronze{color:#B45309;}
+
+.entry-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-1);margin-bottom:12px;}
+.entry-label{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
+.entry-sublabel{font-size:11px;color:var(--text-subtle);margin-bottom:10px;}
+.entry-row{display:flex;align-items:center;gap:12px;}
+.entry-input{flex:1;height:44px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:var(--r-md);padding:0 14px;font-size:16px;font-weight:600;color:var(--text-primary);font-family:'JetBrains Mono',monospace;outline:none;transition:border-color var(--dur-fast);}
+.entry-input:focus{border-color:var(--border-focus);}
+.entry-goal{font-size:12px;color:var(--text-subtle);white-space:nowrap;}
+.entry-sticky-bar{position:sticky;bottom:0;background:var(--bg-primary);border-top:1px solid var(--border-subtle);padding:12px 24px;display:flex;gap:10px;justify-content:flex-end;margin:0 -24px -24px;}
+.gm-notes-textarea{width:100%;min-height:80px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:var(--r-md);padding:12px;font-family:inherit;font-size:13px;color:var(--text-primary);resize:vertical;outline:none;transition:border-color var(--dur-fast);}
+.gm-notes-textarea:focus{border-color:var(--border-focus);}
+.gm-notes-textarea::placeholder{color:var(--text-disabled);}
+
+.threshold-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow-1);margin-bottom:16px;}
+.threshold-slider-wrap{position:relative;height:12px;margin:20px 0 8px;}
+.threshold-track{position:absolute;top:4px;left:0;right:0;height:6px;border-radius:3px;background:linear-gradient(to right,var(--cond-danger) 0%,var(--cond-danger) 20%,var(--cond-emergency) 20%,var(--cond-emergency) 40%,var(--cond-normal) 40%,var(--cond-normal) 60%,var(--cond-affluence) 60%,var(--cond-affluence) 80%,var(--cond-power) 80%);opacity:0.7;}
+.threshold-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-subtle);font-family:'JetBrains Mono',monospace;}
+.metric-selector{background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:var(--r-md);padding:8px 12px;font-size:13px;color:var(--text-primary);outline:none;width:100%;max-width:320px;}
+.preview-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-secondary);border-radius:var(--r-md);margin-top:16px;}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;transition:opacity var(--dur-fast),background var(--dur-fast);cursor:pointer;}
+.btn:hover{opacity:0.88;}
+.btn-primary{background:var(--brand-blue);color:white;}
+.btn-secondary{background:var(--bg-secondary);border:1px solid var(--border-default);color:var(--text-secondary);}
+.btn-danger{background:var(--cond-danger);color:white;}
+.btn-success{background:var(--cond-normal);color:white;}
+.btn-ghost{color:var(--text-subtle);}
+.btn-ghost:hover{background:var(--bg-secondary);color:var(--text-primary);opacity:1;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+
+.mt-4{margin-top:4px;}.mt-8{margin-top:8px;}.mt-16{margin-top:16px;}.mt-24{margin-top:24px;}.mb-16{margin-bottom:16px;}.mb-24{margin-bottom:24px;}
+.flex{display:flex;}.items-center{align-items:center;}.gap-8{gap:8px;}.gap-12{gap:12px;}
+.text-subtle{color:var(--text-subtle);font-size:12px;}
+.divider{height:1px;background:var(--border-subtle);margin:12px 0;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text-subtle);cursor:pointer;margin-bottom:16px;transition:color var(--dur-fast);}
+.back-btn:hover{color:var(--text-primary);}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--brand-blue);}
+
+/* ── MOBILE BACKDROP ── */
+.mobile-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:250;cursor:pointer;}
+.mobile-backdrop.open{display:block;}
+
+/* ── MOBILE MENU BUTTON (hidden on desktop) ── */
+.mobile-menu-btn{display:none;width:34px;height:34px;border-radius:var(--r-md);align-items:center;justify-content:center;color:var(--text-subtle);flex-shrink:0;transition:background var(--dur-fast),color var(--dur-fast);}
+.mobile-menu-btn:hover{background:var(--bg-secondary);color:var(--text-primary);}
+
+/* ── TABLET 768–1200px ── */
+@media(max-width:1200px){
+  .hero-panel{grid-template-columns:180px 1fr;}
+  .hero-panel > :last-child{display:none;}
+  .kpi-row-asym{grid-template-columns:1fr 1fr 1fr;}
+  .kpi-hero-card{grid-column:1/-1;}
+}
+@media(max-width:1024px){
+  .kpi-row-asym{grid-template-columns:1fr 1fr;}
+  .kpi-hero-card{grid-column:1/-1;}
+}
+
+/* ── MOBILE ≤ 768px ── */
+@media(max-width:768px){
+  /* Sidebar: hidden off-screen, slides as overlay */
+  .sidebar{
+    top:0 !important; bottom:0 !important; left:0 !important;
+    width:280px !important; height:100% !important;
+    border-radius:0 20px 20px 0 !important;
+    transform:translateX(-110%) !important;
+    transition:transform var(--dur-normal) var(--ease) !important;
+    z-index:300 !important;
+  }
+  .sidebar.mobile-open{transform:translateX(0) !important;}
+  /* Main area: full width */
+  .main-area,.sidebar.collapsed ~ .main-area{margin-left:0 !important;}
+  .topbar,.sidebar.collapsed ~ .main-area .topbar{left:0 !important;}
+  /* Show mobile hamburger, hide desktop search/role */
+  .mobile-menu-btn{display:flex !important;}
+  .topbar-search{display:none !important;}
+  .role-switch{display:none !important;}
+  /* Topbar compact */
+  .topbar{padding:0 12px;gap:6px;}
+  .breadcrumb{font-size:12px;flex:1;}
+  .period-select span{display:none;}
+  .period-select{padding:6px 8px;min-width:auto;}
+  .lang-btn{padding:4px 7px;}
+  /* Page padding */
+  .page-content{padding:12px;}
+  /* Hero panel: stack */
+  .hero-panel{grid-template-columns:1fr !important;}
+  .hero-panel-score{border-right:none !important;border-bottom:1px solid var(--border-subtle);}
+  .hero-panel-dist{border-right:none !important;border-bottom:1px solid var(--border-subtle);}
+  .hero-panel > :last-child{display:flex !important;}
+  /* KPI grids */
+  .kpi-grid,.kpi-grid-3{grid-template-columns:repeat(2,1fr) !important;gap:10px;}
+  .kpi-row-asym{grid-template-columns:repeat(2,1fr) !important;gap:10px;}
+  .kpi-hero-card{grid-column:1/-1 !important;grid-template-columns:1fr !important;}
+  .kpi-hero-right{display:none;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr) !important;}
+  /* Two-col */
+  .two-col-grid{grid-template-columns:1fr !important;}
+  /* Tables */
+  .data-card,.chart-card,.leaderboard-card{overflow-x:auto;}
+  .data-table{min-width:520px;}
+  /* Chart */
+  #sales-chart{height:160px;}
+  /* Drawer full width */
+  .drawer{width:100vw !important;}
+  /* Greeting */
+  .greeting-title{font-size:18px;}
+}
+
+/* ── VERY SMALL ≤ 480px ── */
+@media(max-width:480px){
+  .kpi-grid,.kpi-grid-3,.kpi-row-asym,.kpi-grid{grid-template-columns:1fr !important;}
+  .kpi-hero-card{grid-column:1 !important;}
+  .hero-dist-grid{grid-template-columns:1fr !important;}
+  .stat-pair{grid-template-columns:1fr !important;}
+  .topbar-btn:not(.notif-btn){display:none;}
+}
+
+/* ── SIDEBAR: ALWAYS DARK · GLASS · FLOATING ── */
+.sidebar{
+  top:10px;
+  left:10px;
+  bottom:10px;
+  height:auto;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.09) !important;
+  background:rgba(16,16,20,0.94) !important;
+  backdrop-filter:blur(32px) saturate(160%);
+  -webkit-backdrop-filter:blur(32px) saturate(160%);
+  box-shadow:0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07);
+  --text-primary:#F0F0F2;
+  --text-secondary:#C8C8CC;
+  --text-subtle:#909096;
+  --text-disabled:#606066;
+  --border-subtle:rgba(255,255,255,0.08);
+  --border-default:rgba(255,255,255,0.14);
+  --sidebar-item-hover-bg:rgba(255,255,255,0.07);
+  --sidebar-item-active-bg:transparent;
+}
+.sidebar .sidebar-header{border-bottom-color:rgba(255,255,255,0.08);padding:0 14px;justify-content:center;position:relative;}
+.sidebar .sidebar-logo{justify-content:center;}
+.sidebar .sidebar-collapse-btn{position:absolute;right:12px;margin-left:0;}
+.sidebar .sidebar-footer{border-top-color:rgba(255,255,255,0.08);}
+.sidebar .sidebar-section-label{color:#505058;font-size:9.5px;padding:14px 16px 4px;letter-spacing:0.1em;}
+.sidebar .sidebar-collapse-btn{color:#707078;border-radius:10px;transition:background var(--dur-fast),color var(--dur-fast),transform var(--dur-fast);}
+.sidebar .sidebar-collapse-btn:hover{background:rgba(255,255,255,0.1);color:#E0E0E4;}
+
+/* ── Nav items base ── */
+.sidebar .nav-item{
+  color:#A8A8B0;
+  border-left:none;
+  border:1px solid transparent;
+  border-radius:12px;
+  margin:2px 10px;
+  padding:9px 12px;
+  gap:10px;
+  transition:background var(--dur-fast),color var(--dur-fast),border-color var(--dur-fast),box-shadow var(--dur-fast);
+}
+.sidebar .nav-item:hover{
+  background:rgba(255,255,255,0.08);
+  color:#E8E8EC;
+  border-color:rgba(255,255,255,0.07);
+}
+
+/* ── Active nav item: glass pill with blue glow ── */
+.sidebar .nav-item.active{
+  background:linear-gradient(135deg,rgba(30,127,204,0.22) 0%,rgba(30,127,204,0.10) 100%);
+  border-color:rgba(96,165,250,0.28);
+  color:#BAD8FF;
+  box-shadow:0 2px 14px rgba(30,127,204,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.sidebar .nav-item.active .nav-icon{filter:drop-shadow(0 0 4px rgba(96,165,250,0.5));}
+
+.sidebar .nav-badge{background:#E11D24;color:white;box-shadow:0 0 8px rgba(225,29,36,0.4);}
+.sidebar .user-avatar{background:linear-gradient(135deg,#1E7FCC,#0EA5E9);}
+.sidebar .user-name{color:#F4F4F5;}
+.sidebar .user-role{color:#606068;}
+.sidebar .user-card{border-radius:12px;border:1px solid transparent;transition:background var(--dur-fast),border-color var(--dur-fast);}
+.sidebar .user-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.06);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img class="logo-full" id="logo-full-img" src="Logos/aromaz-logo-2022-blanco_Mesa%20de%20trabajo%201.png" alt="Aromaz Home" style="height:40px;object-fit:contain;white-space:nowrap;transition:opacity var(--dur-fast);filter:brightness(1.15) contrast(1.1);">
+      </div>
+      <button class="sidebar-collapse-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Colapsar menú">
+        <!-- Chevron left: visible cuando sidebar abierto -->
+        <svg id="icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <!-- Hamburger: visible cuando sidebar colapsado -->
+        <svg id="icon-expand" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="setView('gm-dashboard')" id="nav-gm-dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label" data-i18n="nav.dashboard">Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="setView('sales')" id="nav-sales">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <span class="nav-label" data-i18n="nav.sales">Sales</span>
+      </div>
+      <div class="sidebar-section-label" data-i18n="nav.section.departments">Departments</div>
+      <div class="nav-item" onclick="setView('marketing')" id="nav-marketing">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span class="nav-label" data-i18n="nav.marketing">Marketing</span>
+      </div>
+      <div class="nav-item" onclick="setView('finance')" id="nav-finance">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        <span class="nav-label" data-i18n="nav.finance">Finance</span>
+      </div>
+      <div class="nav-item" onclick="setView('cx')" id="nav-cx">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        <span class="nav-label" data-i18n="nav.customer_service">Customer Service</span>
+      </div>
+      <div class="sidebar-section-label" data-i18n="nav.section.tools">Tools</div>
+      <div class="nav-item" onclick="setView('inbox')" id="nav-inbox">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 003-3V9a7 7 0 0114 0v5a3 3 0 003 3zm-8.27 4a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label" data-i18n="nav.inbox">AI Inbox</span>
+        <span class="nav-badge">5</span>
+      </div>
+      <div class="nav-item" onclick="setView('manual-entry')" id="nav-entry">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span class="nav-label" data-i18n="nav.entry">Log Metrics</span>
+      </div>
+      <div class="nav-item" onclick="setView('thresholds')" id="nav-thresholds">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a1 1 0 00-.12.12M4.93 4.93a1 1 0 01.12.12M4.93 19.07a1 1 0 00.12-.12M19.07 19.07a1 1 0 01-.12-.12M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        <span class="nav-label" data-i18n="nav.thresholds">Thresholds</span>
+      </div>
+      <div class="sidebar-section-label" style="margin-top:8px"></div>
+      <div class="nav-item" onclick="setView('vendor-dashboard')" id="nav-vendor">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label" data-i18n="nav.my_dashboard">My Dashboard</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Marco Baeza</div>
+          <div class="user-role" data-i18n="role.gm">General Manager</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MOBILE SIDEBAR BACKDROP -->
+  <div class="mobile-backdrop" id="mobile-backdrop" onclick="closeMobileSidebar()"></div>
+
+  <!-- DRAWER BACKDROP -->
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+
+  <!-- REPORT DRAWER -->
+  <div class="drawer" id="report-drawer">
+    <div class="drawer-header" id="drawer-header"></div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-footer" id="drawer-footer"></div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-area" id="main-area">
+    <header class="topbar" id="topbar">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="breadcrumb">
+        <span style="color:var(--text-subtle)">Aromaz</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-disabled)"><polyline points="9 18 15 12 9 6"/></svg>
+        <span id="breadcrumb-text" class="breadcrumb-current">GM Dashboard</span>
+      </div>
+      <div class="topbar-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span id="search-ph">Buscar métricas, reportes...</span>
+        <kbd>⌘K</kbd>
+      </div>
+      <div class="role-switch">
+        <button class="role-btn active" id="role-gm" onclick="setRole('gm')">GM</button>
+        <button class="role-btn" id="role-rep" onclick="setRole('rep')">Rep</button>
+      </div>
+      <div class="period-select" onclick="cyclePeriod(this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="period-label">Week 21 &middot; May 17&ndash;23</span>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+        <button class="lang-btn active" onclick="setLang('es')" id="lang-es">ES</button>
+      </div>
+      <button class="topbar-btn" onclick="toggleTheme()" id="theme-btn">
+        <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="topbar-btn" onclick="setView('inbox')" style="position:relative">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-badge">5</span>
+      </button>
+    </header>
+
+    <!-- GM DASHBOARD -->
+    <div class="view active page-content" id="view-gm-dashboard">
+      <div class="hero-panel" id="hero-panel"></div>
+      <div class="section-header">
+        <span class="section-title" data-i18n="section.company_kpis">KPIs de la Compañía &mdash; Semana 21</span>
+      </div>
+      <div class="kpi-row-asym" id="gm-kpis-top"></div>
+      <div class="kpi-grid" id="gm-kpis-bottom"></div>
+      <div class="two-col-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title" data-i18n="chart.sales_trend">Ventas Semanales &mdash; Todo el Equipo</div>
+              <div class="chart-subtitle" data-i18n="chart.sales_subtitle">Últimas 12 semanas vs. línea de meta</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV
+            </button>
+          </div>
+          <div class="chart-body">
+            <svg id="sales-chart" width="100%" height="220" viewBox="0 0 680 220" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--brand-blue)"></div><span data-i18n="legend.actual">Real</span></div>
+            <div class="legend-item"><div class="legend-line"></div><span data-i18n="legend.goal">Meta</span></div>
+          </div>
+        </div>
+        <div class="data-card inbox-panel">
+          <div class="data-card-header">
+            <span class="data-card-title" data-i18n="inbox.pending_title">Reportes IA &mdash; Pendientes</span>
+            <button class="btn btn-ghost btn-sm" onclick="setView('inbox')" data-i18n="action.view_all">Ver todo &rarr;</button>
+          </div>
+          <div id="quick-inbox"></div>
+        </div>
+      </div>
+      <div class="section-header">
+        <span class="section-title" data-i18n="section.departments">Departamentos</span>
+      </div>
+      <div class="data-card mb-24">
+        <table class="data-table" id="dept-table"></table>
+      </div>
+      <div class="section-header">
+        <span class="section-title" data-i18n="section.sales_team">Equipo de Ventas &mdash; Semana 21</span>
+        <button class="btn btn-secondary btn-sm" onclick="setView('sales')" data-i18n="action.view_all">Ver todo &rarr;</button>
+      </div>
+      <div class="data-card mb-24">
+        <table class="data-table" id="vendor-table-gm"></table>
+      </div>
+    </div>
+
+    <!-- SALES VIEW -->
+    <div class="view page-content" id="view-sales">
+      <div class="greeting-strip">
+        <div class="greeting-title" data-i18n="sales.title">Departamento de Ventas</div>
+        <div class="greeting-sub" data-i18n="sales.subtitle">9 vendedores &middot; Edison, Newark, Paterson NJ</div>
+      </div>
+      <div class="section-header"><span class="section-title" data-i18n="section.vendor_detail">Detalle por Vendedor</span></div>
+      <div class="data-card mb-24">
+        <table class="data-table" id="vendor-table-full"></table>
+      </div>
+    </div>
+
+    <!-- VENDOR DASHBOARD -->
+    <div class="view page-content" id="view-vendor-dashboard">
+      <div class="status-banner" id="vendor-banner"></div>
+      <div class="greeting-strip">
+        <div class="greeting-title" id="vendor-greeting"></div>
+        <div class="greeting-sub" id="vendor-greeting-sub"></div>
+      </div>
+      <div class="kpi-grid-3" id="vendor-kpis"></div>
+      <div class="two-col-grid">
+        <div>
+          <div class="section-header"><span class="section-title" data-i18n="section.my_plan">Plan de la Semana</span></div>
+          <div class="plan-card"><div id="plan-items"></div></div>
+          <div style="margin-top:12px">
+            <button class="btn btn-primary" onclick="setView('manual-entry')" style="width:100%">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span data-i18n="action.log_metrics">Registrar Mis Métricas</span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <div class="section-header"><span class="section-title" data-i18n="section.leaderboard">Ranking del Equipo</span></div>
+          <div class="leaderboard-card" id="leaderboard"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INBOX VIEW -->
+    <div class="view page-content" id="view-inbox">
+      <div class="greeting-strip">
+        <div class="greeting-title" data-i18n="inbox.title">Inbox de Reportes IA</div>
+        <div class="greeting-sub" data-i18n="inbox.subtitle">5 reportes pendientes &mdash; ordenados por urgencia</div>
+      </div>
+      <div class="filter-chips" id="filter-chips"></div>
+      <div class="inbox-list-view" id="inbox-rows"></div>
+    </div>
+
+    <!-- MANUAL ENTRY -->
+    <div class="view page-content" id="view-manual-entry">
+      <div class="greeting-strip">
+        <div class="greeting-title" data-i18n="entry.title">Registrar Mis Métricas</div>
+        <div class="greeting-sub" data-i18n="entry.subtitle">Semana 21 &middot; 17&ndash;23 Mayo 2026 &middot; John Smith</div>
+      </div>
+      <div id="entry-fields"></div>
+      <div class="entry-sticky-bar">
+        <button class="btn btn-secondary" onclick="setView('vendor-dashboard')" data-i18n="action.cancel">Cancelar</button>
+        <button class="btn btn-success" onclick="saveEntry()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span data-i18n="action.save">Guardar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- THRESHOLDS VIEW -->
+    <div class="view page-content" id="view-thresholds">
+      <div class="greeting-strip">
+        <div class="greeting-title" data-i18n="thresholds.title">Editor de Umbrales</div>
+        <div class="greeting-sub" data-i18n="thresholds.subtitle">Define los rangos que determinan la Condición de cada métrica</div>
+      </div>
+      <div class="threshold-card">
+        <div style="margin-bottom:16px">
+          <label style="font-size:12px;font-weight:600;color:var(--text-subtle);display:block;margin-bottom:6px" data-i18n="thresholds.select_metric">Seleccionar métrica</label>
+          <select class="metric-selector" id="threshold-metric-sel" onchange="renderThresholdPreview()">
+            <option value="sales-wtd">Sales WTD</option>
+            <option value="quotes">Quotes Sent</option>
+            <option value="cpa">Cost / Lead</option>
+            <option value="conv">Conversion rate</option>
+            <option value="claims">Open claims</option>
+          </select>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-subtle);margin-bottom:4px" data-i18n="thresholds.scale_label">Escala de condición</div>
+        <div class="threshold-slider-wrap">
+          <div class="threshold-track"></div>
+        </div>
+        <div class="threshold-labels">
+          <span>DANGER</span><span>EMERGENCY</span><span>NORMAL</span><span>AFFLUENCE</span><span>POWER</span>
+        </div>
+        <div class="preview-row" id="threshold-preview">
+          <div class="avatar-chip" style="background:#1E7FCC;width:32px;height:32px;font-size:11px">JS</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">John Smith &mdash; Sales WTD</div>
+            <div style="font-size:12px;color:var(--text-subtle);margin-top:2px">$18,400 &rarr; <span data-i18n="cond.normal">Normal</span></div>
+          </div>
+          <span class="cond-badge normal">Normal</span>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="alert(LANG==='es'?'Umbrales guardados':'Thresholds saved')" data-i18n="action.save">Guardar</button>
+          <button class="btn btn-secondary" onclick="alert(LANG==='es'?'Restaurado a valores predeterminados':'Reset to defaults')" data-i18n="thresholds.reset">Restaurar predeterminados</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKETING VIEW -->
+    <div class="view page-content" id="view-marketing">
+      <div class="greeting-strip">
+        <div class="greeting-title">Marketing</div>
+        <div class="greeting-sub" id="mktg-sub">Ravi Patel · Score: 71% · Semana 21</div>
+      </div>
+      <div class="section-header"><span class="section-title">KPIs DE MARKETING — SEMANA 21</span></div>
+      <div class="kpi-grid" id="mktg-kpis"></div>
+      <div class="two-col-grid">
+        <div class="data-card">
+          <div class="data-card-header"><span class="data-card-title" id="mktg-camp-title">Campañas Activas</span></div>
+          <table class="data-table" id="mktg-campaigns"></table>
+        </div>
+        <div class="data-card">
+          <div class="data-card-header"><span class="data-card-title" id="mktg-channel-title">Mix de Canales</span></div>
+          <div id="mktg-channels" style="padding:16px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCE VIEW -->
+    <div class="view page-content" id="view-finance">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="fin-title">Finanzas</div>
+        <div class="greeting-sub" id="fin-sub">Linda Park · Score: 95% · Semana 21</div>
+      </div>
+      <div class="section-header"><span class="section-title">KPIs FINANCIEROS — SEMANA 21</span></div>
+      <div class="kpi-grid" id="fin-kpis"></div>
+      <div class="section-header" style="margin-top:8px"><span class="section-title" id="fin-exp-title">Desglose de Costos</span></div>
+      <div class="data-card mb-24">
+        <table class="data-table" id="fin-expenses"></table>
+      </div>
+    </div>
+
+    <!-- CUSTOMER SERVICE VIEW -->
+    <div class="view page-content" id="view-cx">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="cx-title">Servicio al Cliente</div>
+        <div class="greeting-sub" id="cx-sub">Jordan Ellis · Score: 48% · Semana 21</div>
+      </div>
+      <div class="section-header"><span class="section-title">KPIs DE SERVICIO — SEMANA 21</span></div>
+      <div class="kpi-grid" id="cx-kpis"></div>
+      <div class="section-header" style="margin-top:8px"><span class="section-title" id="cx-tickets-title">Tickets Abiertos</span></div>
+      <div class="data-card mb-24">
+        <table class="data-table" id="cx-tickets"></table>
+      </div>
+    </div>
+
+  </div><!-- /main-area -->
+</div><!-- /app -->
+
+<script>
+/* ── DATA ── */
+const GM_KPIS = [
+  { id:'sales-wtd', label_en:'Sales WTD', label_es:'Ventas semana', value:84320, prefix:'$', suffix:'', delta:12.4, deltaDir:'up', goal:108000, pct:78, condition:'normal', sparkline:[62,58,71,68,79,74,68,72,76,69,84], updated:'2h ago', updatedEs:'hace 2h' },
+  { id:'quotes', label_en:'Quotes Sent', label_es:'Cotizaciones', value:142, prefix:'', suffix:'', delta:8, deltaDir:'down', goal:230, pct:62, condition:'emergency', sparkline:[205,198,210,224,218,200,178,164,158,152,142], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'cpa', label_en:'Cost / Lead', label_es:'Costo / Lead', value:87, prefix:'$', suffix:'', delta:3.1, deltaDir:'up', goal:95, pct:92, condition:'normal', sparkline:[102,98,94,89,92,88,85,87,82,86,87], updated:'20m ago', updatedEs:'hace 20m' },
+  { id:'cash', label_en:'Cash on hand', label_es:'Caja', value:312, prefix:'$', suffix:'k', delta:0.2, deltaDir:'flat', goal:320, pct:97, condition:'normal', sparkline:[298,304,310,315,308,312,318,314,310,315,312], updated:'5m ago', updatedEs:'hace 5m' },
+  { id:'rpe', label_en:'Rev / Employee', label_es:'Ingreso / Empleado', value:18200, prefix:'$', suffix:'', delta:7.4, deltaDir:'up', goal:17500, pct:104, condition:'affluence', sparkline:[15800,16200,16400,16800,17000,17200,17400,17600,17900,18000,18200], updated:'Today', updatedEs:'Hoy' },
+  { id:'conv', label_en:'Conversion rate', label_es:'Tasa conversión', value:38, prefix:'', suffix:'%', delta:4, deltaDir:'up', goal:32, pct:119, condition:'affluence', sparkline:[28,30,29,33,31,34,35,33,36,37,38], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'claims', label_en:'Open claims', label_es:'Reclamos abiertos', value:9, prefix:'', suffix:'', delta:80, deltaDir:'down', goal:4, pct:22, condition:'danger', sparkline:[3,4,5,4,5,6,7,8,9,8,9], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'topclose', label_en:'Top closer', label_es:'Top vendedor', value:147, prefix:'', suffix:'%', delta:24, deltaDir:'up', goal:100, pct:147, condition:'power', sparkline:[98,102,105,108,118,124,130,135,140,144,147], updated:'Today', updatedEs:'Hoy', footnote:'Mike T. · Sales', footnoteEs:'Mike T. · Ventas' },
+];
+
+const SALES_CHART_DATA = [
+  {w:'W10',real:62,goal:75},{w:'W11',real:71,goal:75},{w:'W12',real:88,goal:80},
+  {w:'W13',real:76,goal:80},{w:'W14',real:79,goal:85},{w:'W15',real:91,goal:85},
+  {w:'W16',real:84,goal:90},{w:'W17',real:82,goal:90},{w:'W18',real:96,goal:95},
+  {w:'W19',real:88,goal:95},{w:'W20',real:102,goal:100},{w:'W21',real:84,goal:108}
+];
+
+const DEPARTMENTS = [
+  { id:'cx', name:'Customer Service', nameEs:'Servicio al Cliente', leader:'Jordan Ellis', score:48, met:'2/6', condition:'danger', trend:[68,62,58,54,51,48] },
+  { id:'mktg', name:'Marketing', nameEs:'Marketing', leader:'Ravi Patel', score:71, met:'5/8', condition:'emergency', trend:[78,76,74,72,71,71] },
+  { id:'prod', name:'Products', nameEs:'Productos', leader:'Naomi Cole', score:78, met:'4/5', condition:'normal', trend:[74,75,76,77,78,78] },
+  { id:'sales', name:'Sales', nameEs:'Ventas', leader:'Carla Méndez', score:82, met:'8/10', condition:'normal', trend:[70,72,75,78,80,82] },
+  { id:'ops', name:'Operations', nameEs:'Operaciones', leader:'Tom Reyes', score:88, met:'7/8', condition:'normal', trend:[85,86,86,87,88,88] },
+  { id:'fin', name:'Finance', nameEs:'Finanzas', leader:'Linda Park', score:95, met:'9/9', condition:'affluence', trend:[88,90,91,93,94,95] },
+];
+
+const SALES_TEAM = [
+  { id:'u-mike', name:'Mike Thompson', role:'Senior Sales Rep', loc:'Paterson', wtd:36750, goal:25000, condition:'power', quotes:22, conv:51, you:false },
+  { id:'u-sarah', name:'Sarah Klein', role:'Senior Sales Rep', loc:'Edison', wtd:24100, goal:25000, condition:'normal', quotes:18, conv:19, you:false },
+  { id:'u-marc', name:'Maria González', role:'Sales Rep', loc:'Newark', wtd:22400, goal:22000, condition:'normal', quotes:19, conv:36, you:false },
+  { id:'u-anya', name:'Anya Petrov', role:'Sales Rep', loc:'Edison', wtd:19800, goal:22000, condition:'normal', quotes:16, conv:34, you:false },
+  { id:'u-john', name:'John Smith', role:'Sales Rep', loc:'Paterson', wtd:18400, goal:25000, condition:'normal', quotes:12, conv:32, you:true },
+  { id:'u-greg', name:'Greg Diallo', role:'Sales Rep', loc:'Newark', wtd:16800, goal:22000, condition:'normal', quotes:14, conv:30, you:false },
+  { id:'u-tina', name:'Tina Hua', role:'Junior Sales Rep', loc:'Edison', wtd:14600, goal:18000, condition:'emergency', quotes:11, conv:28, you:false },
+  { id:'u-luis', name:'Luis Reinaga', role:'Junior Sales Rep', loc:'Paterson', wtd:12200, goal:18000, condition:'emergency', quotes:10, conv:26, you:false },
+  { id:'u-pat', name:'Pat Quinones', role:'Trainee', loc:'Newark', wtd:6200, goal:14000, condition:'danger', quotes:7, conv:18, you:false },
+];
+
+const INBOX_REPORTS = [
+  {
+    id:'r1', condition:'danger', fromCondition:'normal',
+    dept:'Sales', deptEs:'Ventas',
+    personFirst:'Sarah', personLast:'K.', avatarColor:'#7C3AED',
+    metricEn:'Conversion rate', metricEs:'Tasa de conversión',
+    reasonEn:'Conv. rate dropped 38% in 2 weeks', reasonEs:'Tasa de conversión cayó 38% en 2 semanas',
+    agoEn:'2h ago', agoEs:'hace 2h',
+    currentValue:'19%', goalValue:'32%', pctOfGoal:'59%', trendNote:'3 weeks declining',
+    analysisEn:"Sarah's closing rate has fallen sharply over the last 2 weeks. Quote-to-visit ratio is stable, but visit-to-close dropped from 41% (90-day avg) to 19%. No external factors observed. Worth investigating qualification process and price objections.",
+    analysisEs:'La tasa de cierre de Sarah ha caído fuertemente en las últimas 2 semanas. La ratio cotización-a-visita está estable, pero visita-a-cierre bajó de 41% (promedio 90d) a 19%. Vale la pena revisar el proceso de calificación y manejo de objeciones.',
+    formula:'DANGER',
+    steps:[
+      {verb:'FIND', verbEs:'DETECTAR', en:'Identify which lead source / product type is converting worst this week.', es:'Identificar qué fuente de lead o tipo de producto está convirtiendo peor esta semana.'},
+      {verb:'STRENGTHEN', verbEs:'REFORZAR', en:'Pair Sarah with Mike T. for 3 in-home visits this week (shadowing).', es:'Acompañar a Sarah con Mike T. en 3 visitas a domicilio esta semana (shadowing).'},
+      {verb:'REORGANIZE', verbEs:'REORGANIZAR', en:'Move price-sensitive leads to a different rep until objection handling is fixed.', es:'Mover leads sensibles al precio a otro vendedor hasta corregir manejo de objeciones.'},
+      {verb:'RECONNECT', verbEs:'RECONECTAR', en:'1:1 with Marco on Friday to align on personal blockers + PPF impact.', es:'1:1 con Marco el viernes para alinear bloqueos personales y revisar impacto PPF.'},
+    ],
+  },
+  {
+    id:'r2', condition:'emergency', fromCondition:'normal',
+    dept:'Marketing', deptEs:'Marketing',
+    personFirst:'Google Ads', personLast:'NJ-2', avatarColor:'#EA580C',
+    metricEn:'Cost per acquisition', metricEs:'Costo por adquisición',
+    reasonEn:'CPA up 220% over last 14 days', reasonEs:'CPA subió 220% en los últimos 14 días',
+    agoEn:'4h ago', agoEs:'hace 4h',
+    currentValue:'$184', goalValue:'$70', pctOfGoal:'262%', trendNote:'climbing every day',
+    analysisEn:"Edison-area Google Ads CPA jumped from $70 to $184 since competitor Floors4Less doubled their bid on hardwood-related keywords. CTR is unchanged but cost-per-click rose from $4.20 to $11.40. ROAS is now 1.6 (below 2.5 threshold).",
+    analysisEs:'El CPA del campaña Google Ads de Edison saltó de $70 a $184 desde que el competidor Floors4Less duplicó sus ofertas en keywords de pisos de madera. El CTR no cambió pero el costo-por-click subió de $4.20 a $11.40. ROAS está en 1.6 (bajo umbral de 2.5).',
+    formula:'EMERGENCY',
+    steps:[
+      {verb:'PROMOTE', verbEs:'PROMOVER', en:'Shift 40% of Edison budget to Paterson + South NJ where CPA holds at $62.', es:'Mover 40% del presupuesto de Edison a Paterson y South NJ donde el CPA se mantiene en $62.'},
+      {verb:'CHANGE BASIS', verbEs:'CAMBIAR BASE', en:'Pause hardwood broad-match keywords, switch to long-tail + branded.', es:'Pausar keywords broad-match de hardwood y cambiar a long-tail y de marca.'},
+      {verb:'ECONOMIZE', verbEs:'ECONOMIZAR', en:'Cap daily spend at $180 until CPA returns under $90.', es:'Limitar gasto diario a $180 hasta que el CPA vuelva bajo $90.'},
+      {verb:'PREPARE FOR FUTURE', verbEs:'PREPARAR EL FUTURO', en:'Spin up Meta Ads test in Edison ZIPs to diversify channel mix.', es:'Lanzar test de Meta Ads en códigos postales de Edison para diversificar el mix.'},
+    ],
+  },
+  {
+    id:'r3', condition:'emergency', fromCondition:'normal',
+    dept:'Sales', deptEs:'Ventas',
+    personFirst:'John', personLast:'Smith', avatarColor:'#1E7FCC',
+    metricEn:'Quotes sent (weekly)', metricEs:'Cotizaciones enviadas (semanal)',
+    reasonEn:'Quotes -42% vs 90-day average', reasonEs:'Cotizaciones -42% vs promedio 90d',
+    agoEn:'5h ago', agoEs:'hace 5h',
+    currentValue:'14', goalValue:'25', pctOfGoal:'56%', trendNote:'3 weeks declining',
+    analysisEn:"John has reduced his quote volume by 42% vs the quarterly average. Follow-ups also dropped (8 vs 18 avg). No external factors. Pipeline aging suggests his focus drifted toward older deals instead of new prospecting.",
+    analysisEs:'John ha reducido su volumen de cotizaciones un 42% respecto al promedio trimestral. Follow-ups también bajaron (8 vs 18 promedio). Sin factores externos. El aging del pipeline sugiere que su foco se desvió a deals viejos.',
+    formula:'EMERGENCY',
+    steps:[
+      {verb:'PROMOTE', verbEs:'PROMOVER', en:'Reactivate top 30 contacts from last 60 days in the high-priority pipeline.', es:'Reactivar los 30 contactos prioritarios de los últimos 60 días en pipeline.'},
+      {verb:'CHANGE BASIS', verbEs:'CAMBIAR BASE', en:'Block two 90-min prospecting slots into daily calendar (9–10:30, 2–3:30 PM).', es:'Bloquear dos slots de prospección de 90min en la agenda (9–10:30, 14–15:30).'},
+      {verb:'ECONOMIZE', verbEs:'ECONOMIZAR', en:'Pause non-quote-generating activities (training, internal meetings).', es:'Pausar actividades que no generen cotizaciones (capacitación, juntas internas).'},
+      {verb:'PREPARE FOR FUTURE', verbEs:'PREPARAR EL FUTURO', en:'Review pipeline with sales lead Friday — identify aging deals to close or kill.', es:'Revisar pipeline con líder comercial el viernes — identificar deals viejos para cerrar o matar.'},
+    ],
+  },
+  {
+    id:'r4', condition:'power', fromCondition:'affluence',
+    dept:'Sales', deptEs:'Ventas',
+    personFirst:'Mike', personLast:'Thompson', avatarColor:'#16A34A',
+    metricEn:'Sales WTD', metricEs:'Ventas semana',
+    reasonEn:'Sales WTD +147% above target', reasonEs:'Ventas semana +147% sobre meta',
+    agoEn:'1d ago', agoEs:'hace 1d',
+    currentValue:'$36,750', goalValue:'$25,000', pctOfGoal:'147%', trendNote:'4 weeks improving',
+    analysisEn:"Mike closed 3 high-ticket hardwood jobs this week ($12k, $11.5k, $8.2k) from 4 referrals. Conversion at 51%. He has 6 visits scheduled next week — projection suggests he could hold Power for a 5th week if pipeline holds.",
+    analysisEs:'Mike cerró 3 trabajos grandes de hardwood esta semana ($12k, $11.5k, $8.2k) gracias a 4 referidos. Conversión en 51%. Tiene 6 visitas programadas la próxima semana — proyección sugiere que podría mantener Poder por 5a semana.',
+    formula:'POWER',
+    steps:[
+      {verb:"DON'T DISCONNECT", verbEs:'NO DESCONECTAR', en:"Keep current daily routine intact. Don't add meetings or admin tasks.", es:'Mantener la rutina diaria actual. No agregar reuniones nuevas ni tareas admin.'},
+      {verb:'DOCUMENT', verbEs:'DOCUMENTAR', en:'Capture the referral pitch + qualification questions in SOP for the rest of the team.', es:'Documentar el pitch de referidos y preguntas de calificación en SOP para el equipo.'},
+      {verb:'PROTECT', verbEs:'PROTEGER', en:'Shield from internal meetings this week — Carla absorbs his queue.', es:'Bloquear reuniones internas esta semana — Carla absorbe su cola.'},
+      {verb:'REINFORCE', verbEs:'REFORZAR', en:'Public recognition in Friday all-hands + $500 spot bonus.', es:'Reconocimiento público en el all-hands del viernes + bono spot de $500.'},
+    ],
+  },
+  {
+    id:'r5', condition:'emergency', fromCondition:'normal',
+    dept:'Operations', deptEs:'Operaciones',
+    personFirst:'Install Crew', personLast:'#4', avatarColor:'#EA580C',
+    metricEn:'Install completion time', metricEs:'Tiempo de instalación',
+    reasonEn:'Avg install time 38% over standard', reasonEs:'Tiempo promedio 38% sobre estándar',
+    agoEn:'7h ago', agoEs:'hace 7h',
+    currentValue:'6.4d', goalValue:'4.0d', pctOfGoal:'160%', trendNote:'started 2 weeks ago',
+    analysisEn:"Crew #4 has averaged 6.4 days per install for last 6 jobs (vs 4-day SOP). Material delivery delays (2.1d avg vs 0.8d std) account for ~50% of the gap. Customer complaints up 3x.",
+    analysisEs:'La cuadrilla #4 promedia 6.4 días por instalación en los últimos 6 trabajos (vs SOP de 4 días). Demoras en entrega de material (2.1d vs 0.8d std) explican ~50% del desfase. Quejas de clientes 3x.',
+    formula:'EMERGENCY',
+    steps:[
+      {verb:'PROMOTE', verbEs:'PROMOVER', en:'Move next 4 jobs to Crew #2 (currently at 3.6d avg).', es:'Mover los próximos 4 trabajos a la cuadrilla #2 (actualmente en 3.6d promedio).'},
+      {verb:'CHANGE BASIS', verbEs:'CAMBIAR BASE', en:'Switch to scheduled delivery 24h before crew arrival, not same-day.', es:'Cambiar a entrega programada 24h antes de la llegada de la cuadrilla, no mismo día.'},
+      {verb:'ECONOMIZE', verbEs:'ECONOMIZAR', en:'Stop accepting same-week installs until delivery process is fixed.', es:'Dejar de aceptar instalaciones de misma semana hasta corregir el proceso.'},
+      {verb:'PREPARE FOR FUTURE', verbEs:'PREPARAR EL FUTURO', en:'Audit warehouse pick process Monday — 30 min walkthrough with Tom.', es:'Auditar el proceso de pick del almacén el lunes — 30 min con Tom.'},
+    ],
+  },
+];
+
+const MY_METRICS = [
+  { id:'sales-wtd', label_en:'Sales WTD', label_es:'Ventas semana', value:'$18,400', goal:'$25,000', pct:74, condition:'normal' },
+  { id:'quotes', label_en:'Quotes sent', label_es:'Cotizaciones', value:'12', goal:'20', pct:60, condition:'emergency' },
+  { id:'conv', label_en:'Conv. rate', label_es:'Tasa conversión', value:'32%', goal:'32%', pct:100, condition:'normal' },
+  { id:'followups', label_en:'Follow-ups', label_es:'Seguimientos', value:'14', goal:'12', pct:117, condition:'affluence' },
+  { id:'visits', label_en:'Home visits', label_es:'Visitas domicilio', value:'6', goal:'6', pct:100, condition:'normal' },
+  { id:'errors', label_en:'Mistakes logged', label_es:'Errores registrados', value:'2', goal:'1', pct:200, condition:'emergency' },
+];
+
+const PLAN_ITEMS = [
+  { text_en:'Follow up 30 leads from last 60 days', text_es:'Seguimiento a 30 leads de últimos 60 días', done:true },
+  { text_en:'Send 5 new quotes by Thursday', text_es:'Enviar 5 cotizaciones nuevas antes del jueves', done:true },
+  { text_en:'Close on-site visit — Peterson client', text_es:'Cerrar visita domicilio — cliente Peterson', done:false },
+  { text_en:'1:1 with Marco — Friday 4:00 PM', text_es:'1:1 con Marco — Viernes 4:00 PM', done:false },
+];
+
+const ENTRY_FIELDS = [
+  { key:'sales', label_en:'Closed Sales', label_es:'Ventas Cerradas', unit:'$', prev:17200, goal:25000 },
+  { key:'quotes', label_en:'Quotes Sent', label_es:'Cotizaciones Enviadas', unit:'', prev:11, goal:20 },
+  { key:'followups', label_en:'Follow-ups', label_es:'Follow-ups Realizados', unit:'', prev:12, goal:12 },
+  { key:'new_cl', label_en:'New Customers', label_es:'Clientes Nuevos', unit:'', prev:2, goal:3 },
+  { key:'ref_cl', label_en:'Referred Customers', label_es:'Clientes Referidos', unit:'', prev:1, goal:2 },
+  { key:'errors', label_en:'Errors Committed', label_es:'Errores Cometidos', unit:'', prev:1, goal:0, note_en:'Brief description', note_es:'Descripción breve' },
+];
+
+const MARKETING_KPIS = [
+  { id:'cpa-mktg', label_en:'Cost per Acquisition', label_es:'Costo por Adquisición', value:184, prefix:'$', suffix:'', delta:220, deltaDir:'down', goal:70, pct:38, condition:'danger', sparkline:[70,72,88,95,112,134,156,168,175,180,184], updated:'4h ago', updatedEs:'hace 4h' },
+  { id:'leads', label_en:'Leads Generated', label_es:'Leads Generados', value:124, prefix:'', suffix:'', delta:12, deltaDir:'down', goal:200, pct:62, condition:'emergency', sparkline:[180,175,170,165,158,152,148,140,135,128,124], updated:'2h ago', updatedEs:'hace 2h' },
+  { id:'roas', label_en:'ROAS', label_es:'ROAS', value:1.6, prefix:'', suffix:'x', delta:36, deltaDir:'down', goal:2.5, pct:64, condition:'emergency', sparkline:[2.8,2.6,2.5,2.3,2.2,2.0,1.9,1.8,1.7,1.6,1.6], updated:'4h ago', updatedEs:'hace 4h' },
+  { id:'ctr', label_en:'Click-through Rate', label_es:'Tasa de Clics', value:3.2, prefix:'', suffix:'%', delta:0.4, deltaDir:'up', goal:3.0, pct:107, condition:'affluence', sparkline:[2.6,2.7,2.8,2.8,2.9,3.0,3.0,3.1,3.1,3.2,3.2], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'impressions', label_en:'Impressions', label_es:'Impresiones', value:48200, prefix:'', suffix:'', delta:8, deltaDir:'up', goal:50000, pct:96, condition:'normal', sparkline:[42000,43500,44200,45000,45800,46200,46800,47100,47600,48000,48200], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'email-open', label_en:'Email Open Rate', label_es:'Apertura de Emails', value:24, prefix:'', suffix:'%', delta:2, deltaDir:'up', goal:22, pct:109, condition:'affluence', sparkline:[19,20,20,21,21,22,22,23,23,24,24], updated:'Today', updatedEs:'Hoy' },
+  { id:'social', label_en:'Social Followers', label_es:'Seguidores', value:12840, prefix:'', suffix:'', delta:3.1, deltaDir:'up', goal:15000, pct:86, condition:'normal', sparkline:[11200,11400,11600,11800,12000,12100,12300,12500,12650,12750,12840], updated:'Today', updatedEs:'Hoy' },
+  { id:'conv-mktg', label_en:'Lead Conversion', label_es:'Conversión de Leads', value:18, prefix:'', suffix:'%', delta:4, deltaDir:'down', goal:25, pct:72, condition:'emergency', sparkline:[25,24,23,22,22,21,21,20,19,18,18], updated:'1h ago', updatedEs:'hace 1h' },
+];
+
+const CAMPAIGNS = [
+  { name:'Google Ads — Edison NJ', budget:2400, spent:1800, leads:14, cpa:184, condition:'danger', trend:[70,90,110,140,160,184] },
+  { name:'Google Ads — Paterson', budget:1800, spent:1200, leads:19, cpa:63, condition:'normal', trend:[70,68,65,64,63,63] },
+  { name:'Meta Ads — Hardwood', budget:1200, spent:980, leads:22, cpa:45, condition:'normal', trend:[52,50,48,47,45,45] },
+  { name:'Email Campaign — May', budget:400, spent:400, leads:18, cpa:22, condition:'affluence', trend:[28,26,25,23,22,22] },
+  { name:'SEO / Organic', budget:800, spent:800, leads:51, cpa:16, condition:'power', trend:[20,18,17,17,16,16] },
+];
+
+const FINANCE_KPIS = [
+  { id:'revenue', label_en:'Revenue WTD', label_es:'Ingresos Semana', value:312000, prefix:'$', suffix:'', delta:8.2, deltaDir:'up', goal:300000, pct:104, condition:'affluence', sparkline:[280,285,290,295,298,302,305,308,310,311,312], updated:'5m ago', updatedEs:'hace 5m' },
+  { id:'gmargin', label_en:'Gross Margin', label_es:'Margen Bruto', value:38.4, prefix:'', suffix:'%', delta:1.2, deltaDir:'up', goal:37.0, pct:104, condition:'affluence', sparkline:[36.1,36.4,36.8,37.0,37.2,37.4,37.8,38.0,38.1,38.3,38.4], updated:'Today', updatedEs:'Hoy' },
+  { id:'opcosts', label_en:'Operating Costs', label_es:'Costos Operativos', value:186000, prefix:'$', suffix:'', delta:2.1, deltaDir:'down', goal:200000, pct:93, condition:'normal', sparkline:[195,193,191,190,189,188,188,187,187,186,186], updated:'Today', updatedEs:'Hoy' },
+  { id:'ar', label_en:'Accounts Receivable', label_es:'Cuentas por Cobrar', value:67800, prefix:'$', suffix:'', delta:5.3, deltaDir:'up', goal:55000, pct:123, condition:'emergency', sparkline:[52,55,58,60,62,63,64,65,66,67,67.8], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'cashflow', label_en:'Cash Flow', label_es:'Flujo de Caja', value:48200, prefix:'$', suffix:'', delta:14, deltaDir:'up', goal:40000, pct:121, condition:'affluence', sparkline:[36,38,40,41,42,44,45,46,47,48,48.2], updated:'Today', updatedEs:'Hoy' },
+  { id:'ebitda', label_en:'EBITDA Margin', label_es:'Margen EBITDA', value:22.1, prefix:'', suffix:'%', delta:0.8, deltaDir:'up', goal:20.0, pct:110, condition:'affluence', sparkline:[19.2,19.5,19.8,20.1,20.3,20.5,20.8,21.0,21.4,21.8,22.1], updated:'Today', updatedEs:'Hoy' },
+  { id:'payroll', label_en:'Payroll Cost', label_es:'Costo de Nómina', value:82000, prefix:'$', suffix:'', delta:0.5, deltaDir:'up', goal:85000, pct:96, condition:'normal', sparkline:[80,80,81,81,81,82,82,82,82,82,82], updated:'Today', updatedEs:'Hoy' },
+  { id:'ar-days', label_en:'Days Sales Outstanding', label_es:'Días de Cobro', value:31, prefix:'', suffix:'d', delta:10, deltaDir:'down', goal:28, pct:89, condition:'normal', sparkline:[28,28,29,29,30,30,30,31,31,31,31], updated:'1h ago', updatedEs:'hace 1h' },
+];
+
+const EXPENSE_BREAKDOWN = [
+  { cat_en:'Labor', cat_es:'Mano de Obra', amount:82000, pct:44, condition:'normal', trend:[80,81,82,82,82,82] },
+  { cat_en:'Materials', cat_es:'Materiales', amount:54000, pct:29, condition:'normal', trend:[58,57,56,55,54,54] },
+  { cat_en:'Marketing', cat_es:'Marketing', amount:22000, pct:12, condition:'emergency', trend:[18,19,20,21,22,22] },
+  { cat_en:'Operations', cat_es:'Operaciones', amount:18000, pct:10, condition:'normal', trend:[18,18,18,18,18,18] },
+  { cat_en:'G&A', cat_es:'G&A', amount:10000, pct:5, condition:'normal', trend:[10,10,10,10,10,10] },
+];
+
+const CX_KPIS = [
+  { id:'open-claims-cx', label_en:'Open Claims', label_es:'Reclamos Abiertos', value:9, prefix:'', suffix:'', delta:80, deltaDir:'down', goal:4, pct:22, condition:'danger', sparkline:[3,4,5,4,5,6,7,8,9,8,9], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'csat', label_en:'Satisfaction (CSAT)', label_es:'Satisfacción (CSAT)', value:3.2, prefix:'', suffix:'/5', delta:25, deltaDir:'down', goal:4.5, pct:71, condition:'emergency', sparkline:[4.4,4.3,4.2,4.1,4.0,3.8,3.7,3.6,3.4,3.3,3.2], updated:'Today', updatedEs:'Hoy' },
+  { id:'resolution', label_en:'Avg Resolution Time', label_es:'Tiempo de Resolución', value:4.8, prefix:'', suffix:'d', delta:60, deltaDir:'down', goal:2.0, pct:42, condition:'danger', sparkline:[2.1,2.3,2.5,2.7,3.0,3.3,3.6,3.9,4.2,4.5,4.8], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'first-resp', label_en:'First Response Time', label_es:'Primera Respuesta', value:3.4, prefix:'', suffix:'h', delta:13, deltaDir:'down', goal:2.0, pct:58, condition:'emergency', sparkline:[2.0,2.1,2.2,2.3,2.4,2.6,2.8,3.0,3.1,3.2,3.4], updated:'2h ago', updatedEs:'hace 2h' },
+  { id:'nps', label_en:'NPS Score', label_es:'Puntuación NPS', value:28, prefix:'', suffix:'', delta:18, deltaDir:'down', goal:50, pct:56, condition:'emergency', sparkline:[48,46,44,42,40,38,36,34,32,30,28], updated:'Today', updatedEs:'Hoy' },
+  { id:'escalations', label_en:'Escalations', label_es:'Escalaciones', value:4, prefix:'', suffix:'', delta:33, deltaDir:'down', goal:2, pct:50, condition:'emergency', sparkline:[1,1,2,1,2,2,3,3,4,3,4], updated:'30m ago', updatedEs:'hace 30m' },
+  { id:'tickets-closed', label_en:'Tickets Closed', label_es:'Tickets Cerrados', value:12, prefix:'', suffix:'', delta:8, deltaDir:'down', goal:20, pct:60, condition:'emergency', sparkline:[20,19,18,18,17,16,15,14,13,13,12], updated:'1h ago', updatedEs:'hace 1h' },
+  { id:'cx-cost', label_en:'Cost per Resolution', label_es:'Costo por Resolución', value:142, prefix:'$', suffix:'', delta:18, deltaDir:'down', goal:80, pct:56, condition:'emergency', sparkline:[80,85,90,95,105,110,118,124,132,138,142], updated:'Today', updatedEs:'Hoy' },
+];
+
+const CX_TICKETS = [
+  { id:'TK-091', client:'Peterson Family', issue_en:'Installation damage — hardwood scratch', issue_es:'Daño en instalación — rasguño en hardwood', age:8, condition:'danger', agent:'Jordan E.', priority:'Alta' },
+  { id:'TK-087', client:'María Suárez', issue_en:'Product defect — tile cracking after 2 weeks', issue_es:'Defecto de producto — baldosa agrietada a 2 semanas', age:6, condition:'danger', agent:'Jordan E.', priority:'Alta' },
+  { id:'TK-094', client:'Chen Residence', issue_en:'Scheduling conflict — reschedule needed', issue_es:'Conflicto de agenda — necesita reprogramar', age:3, condition:'emergency', agent:'Jordan E.', priority:'Media' },
+  { id:'TK-089', client:'Robert Okafor', issue_en:'Invoice dispute — overcharged $340', issue_es:'Disputa de factura — cobro excesivo $340', age:2, condition:'emergency', agent:'Sin asignar', priority:'Media' },
+  { id:'TK-096', client:'The Garcias', issue_en:'Delivery delay — material not arrived', issue_es:'Demora en entrega — material no llegó', age:1, condition:'normal', agent:'Jordan E.', priority:'Normal' },
+  { id:'TK-098', client:'Linda Kowalski', issue_en:'Color mismatch — wrong laminate shade', issue_es:'Diferencia de color — tono de laminado incorrecto', age:1, condition:'normal', agent:'Sin asignar', priority:'Normal' },
+];
+
+const COND_COLORS = { danger:'var(--cond-danger)', emergency:'var(--cond-emergency)', normal:'var(--cond-normal)', affluence:'var(--cond-affluence)', power:'var(--cond-power)' };
+
+/* ── I18N ── */
+let LANG = 'es';
+const T = {
+  en: {
+    'nav.dashboard':'Dashboard','nav.sales':'Sales','nav.my_dashboard':'My Dashboard',
+    'nav.marketing':'Marketing','nav.finance':'Finance','nav.customer_service':'Customer Service',
+    'nav.inbox':'AI Inbox','nav.entry':'Log Metrics','nav.thresholds':'Thresholds',
+    'nav.section.departments':'Departments','nav.section.tools':'Tools',
+    'role.gm':'General Manager',
+    'dashboard.company_status':'Company: Normal',
+    'dashboard.metrics_green':'28 green metrics · 4 yellow · 2 red',
+    'dashboard.attention_cta':'2 critical metrics',
+    'section.company_kpis':'Company KPIs — Week 21',
+    'section.departments':'Departments','section.sales_team':'Sales Team — Week 21',
+    'section.vendor_detail':'Vendor Detail','section.my_plan':"This Week's Plan",
+    'section.leaderboard':'Team Leaderboard',
+    'chart.sales_trend':'Weekly Sales — All Vendors',
+    'chart.sales_subtitle':'Last 12 weeks vs. goal line',
+    'legend.actual':'Actual','legend.goal':'Goal',
+    'inbox.pending_title':'AI Reports — Pending',
+    'inbox.title':'AI Report Inbox',
+    'inbox.subtitle':'5 reports pending your review — sorted by urgency',
+    'sales.title':'Sales Department','sales.subtitle':'9 vendors · Edison, Newark, Paterson NJ',
+    'entry.title':'Log My Metrics','entry.subtitle':'Week 21 · May 17–23, 2026 · John Smith',
+    'thresholds.title':'Threshold Editor','thresholds.subtitle':'Define the ranges that determine each metric\'s Condition',
+    'thresholds.select_metric':'Select metric','thresholds.scale_label':'Condition scale','thresholds.reset':'Reset to defaults',
+    'action.view_all':'View all →','action.back_inbox':'Back to inbox',
+    'action.log_metrics':'Log My Weekly Metrics',
+    'action.cancel':'Cancel','action.save':'Save',
+    'action.approve':'Approve & Send','action.edit':'Edit','action.defer':'Snooze 24h','action.reject':'Reject',
+    'cond.danger':'Danger','cond.emergency':'Emergency','cond.normal':'Normal','cond.affluence':'Affluence','cond.power':'Power',
+    'table.vendor':'Vendor','table.location':'Location','table.sales':'Sales WTD','table.goal':'Goal',
+    'table.pct':'%','table.quotes':'Quotes','table.conv':'Conv%','table.condition':'Condition','table.trend':'Trend',
+    'table.dept':'Department','table.leader':'Leader','table.score':'Score','table.metrics':'Metrics',
+    'table.role':'Role',
+    'filter.all':'All','filter.danger':'Danger','filter.emergency':'Emergency','filter.power':'Power',
+    'report.ai_generated':'AI Generated Report','report.pending':'Pending GM Review',
+    'report.value':'Current Value','report.goal':'Goal','report.pct_goal':'% of Goal',
+    'report.trend':'Trend','report.analysis':'Analysis','report.action_plan':'Action Plan',
+    'report.gm_notes':'GM Notes','report.gm_notes_ph':'Add your notes here...',
+    'entry.goal_label':'Goal','vendor.you':'you',
+    'vendor.status_normal':'Your metrics are on track this week.',
+    'vendor.status_emergency':'Some metrics need attention this week.',
+  },
+  es: {
+    'nav.dashboard':'Dashboard','nav.sales':'Ventas','nav.my_dashboard':'Mi Dashboard',
+    'nav.marketing':'Marketing','nav.finance':'Finanzas','nav.customer_service':'Servicio al Cliente',
+    'nav.inbox':'Inbox IA','nav.entry':'Registrar Métricas','nav.thresholds':'Umbrales',
+    'nav.section.departments':'Departamentos','nav.section.tools':'Herramientas',
+    'role.gm':'Gerente General',
+    'dashboard.company_status':'Compañía: Normal',
+    'dashboard.metrics_green':'28 métricas verdes · 4 amarillas · 2 rojas',
+    'dashboard.attention_cta':'2 métricas críticas',
+    'section.company_kpis':'KPIs de la Compañía — Semana 21',
+    'section.departments':'Departamentos','section.sales_team':'Equipo de Ventas — Semana 21',
+    'section.vendor_detail':'Detalle por Vendedor','section.my_plan':'Plan de la Semana',
+    'section.leaderboard':'Ranking del Equipo',
+    'chart.sales_trend':'Ventas Semanales — Todo el Equipo',
+    'chart.sales_subtitle':'Últimas 12 semanas vs. línea de meta',
+    'legend.actual':'Real','legend.goal':'Meta',
+    'inbox.pending_title':'Reportes IA — Pendientes',
+    'inbox.title':'Inbox de Reportes IA',
+    'inbox.subtitle':'5 reportes pendientes de revisión — ordenados por urgencia',
+    'sales.title':'Departamento de Ventas','sales.subtitle':'9 vendedores · Edison, Newark, Paterson NJ',
+    'entry.title':'Registrar Mis Métricas','entry.subtitle':'Semana 21 · 17–23 Mayo 2026 · John Smith',
+    'thresholds.title':'Editor de Umbrales','thresholds.subtitle':'Define los rangos que determinan la Condición de cada métrica',
+    'thresholds.select_metric':'Seleccionar métrica','thresholds.scale_label':'Escala de condición','thresholds.reset':'Restaurar predeterminados',
+    'action.view_all':'Ver todo →','action.back_inbox':'Volver al inbox',
+    'action.log_metrics':'Registrar Mis Métricas Semanales',
+    'action.cancel':'Cancelar','action.save':'Guardar',
+    'action.approve':'Aprobar y Enviar','action.edit':'Editar','action.defer':'Diferir 24h','action.reject':'Rechazar',
+    'cond.danger':'Peligro','cond.emergency':'Emergencia','cond.normal':'Normal','cond.affluence':'Afluencia','cond.power':'Poder',
+    'table.vendor':'Vendedor','table.location':'Ubicación','table.sales':'Ventas sem.','table.goal':'Meta',
+    'table.pct':'%','table.quotes':'Cotizaciones','table.conv':'Conv%','table.condition':'Condición','table.trend':'Tendencia',
+    'table.dept':'Departamento','table.leader':'Líder','table.score':'Score','table.metrics':'Métricas',
+    'table.role':'Rol',
+    'filter.all':'Todos','filter.danger':'Peligro','filter.emergency':'Emergencia','filter.power':'Poder',
+    'report.ai_generated':'Reporte Generado por IA','report.pending':'Pendiente revisión del GM',
+    'report.value':'Valor Actual','report.goal':'Meta','report.pct_goal':'% de Meta',
+    'report.trend':'Tendencia','report.analysis':'Análisis','report.action_plan':'Plan de Acción',
+    'report.gm_notes':'Notas del GM','report.gm_notes_ph':'Agrega tus notas aquí...',
+    'entry.goal_label':'Meta','vendor.you':'tú',
+    'vendor.status_normal':'Tus métricas están en camino esta semana.',
+    'vendor.status_emergency':'Algunas métricas necesitan atención esta semana.',
+  }
+};
+function t(k){return(T[LANG]&&T[LANG][k])||T.en[k]||k;}
+
+/* ── SPARKLINES ── */
+function drawSparkline(data, color) {
+  if(!data||!data.length) return '';
+  const w=100,h=32,min=Math.min(...data),max=Math.max(...data),span=max-min||1,step=w/(data.length-1);
+  const pts=data.map((v,i)=>({x:(i*step).toFixed(2),y:(h-((v-min)/span)*h*0.85-2).toFixed(2)}));
+  const linePath='M'+pts.map(p=>p.x+','+p.y).join('L');
+  const fillPath=linePath+'L'+pts[pts.length-1].x+','+h+'L0,'+h+'Z';
+  const last=pts[pts.length-1];
+  const gid='sg'+Math.random().toString(36).slice(2,6);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${fillPath}" fill="url(#${gid})"/>
+    <path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${last.x}" cy="${last.y}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
+function drawTrendSparkline(data, color) {
+  const w=64,h=22,min=Math.min(...data),max=Math.max(...data),span=max-min||1,step=w/(data.length-1);
+  const pts=data.map((v,i)=>`${(i*step).toFixed(1)},${(h-((v-min)/span)*h*0.8-2).toFixed(1)}`);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="M${pts.join('L')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+}
+
+/* ── COND HELPERS ── */
+const COND_ICONS = {
+  danger:`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  emergency:`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  normal:`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+  affluence:`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
+  power:`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+};
+function condBadge(c){return `<span class="cond-badge ${c}">${COND_ICONS[c]||''}${t('cond.'+c)}</span>`;}
+function initials(name){const p=name.split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
+function fmtMoney(v){return v>=1000?'$'+(v/1000).toFixed(v%1000?1:0)+'k':'$'+v;}
+
+/* ── HERO PANEL ── */
+function renderHeroPanel() {
+  const el=document.getElementById('hero-panel');
+  if(!el)return;
+  const condCounts={danger:0,emergency:0,normal:0,affluence:0,power:0};
+  GM_KPIS.forEach(k=>{if(condCounts[k.condition]!==undefined)condCounts[k.condition]++;});
+  const total=GM_KPIS.length;
+  const avgScore=Math.round(GM_KPIS.reduce((s,k)=>s+Math.min(k.pct,100),0)/total);
+  const overallCond=avgScore>=100?'power':avgScore>=90?'affluence':avgScore>=70?'normal':avgScore>=50?'emergency':'danger';
+  const R=44,circumference=2*Math.PI*R;
+  const filled=(Math.min(avgScore,100)/100)*circumference;
+  const condOrder=['danger','emergency','normal','affluence','power'];
+  const condLbls={danger:t('cond.danger'),emergency:t('cond.emergency'),normal:t('cond.normal'),affluence:t('cond.affluence'),power:t('cond.power')};
+  const distBar=condOrder.map(c=>condCounts[c]>0?`<div class="hero-dist-seg" style="flex:${condCounts[c]};background:var(--cond-${c})"></div>`:'').join('');
+  const distRows=condOrder.map(c=>`<div class="hero-dist-row">
+    <div class="hero-dist-cond"><div style="width:8px;height:8px;border-radius:50%;background:var(--cond-${c});flex-shrink:0"></div><span>${condLbls[c]}</span></div>
+    <span class="hero-dist-count" style="color:var(--cond-${c})">${condCounts[c]}</span>
+  </div>`).join('');
+  const alertR=INBOX_REPORTS.find(r=>r.condition==='danger')||INBOX_REPORTS.find(r=>r.condition==='emergency');
+  const alertHtml=alertR?`
+    <div>
+      <div class="hero-alert-tag"><div class="hero-alert-dot"></div><span style="color:var(--cond-${alertR.condition})">${LANG==='es'?'Alerta Crítica':'Critical Alert'}</span></div>
+      <div class="hero-alert-text"><span>${alertR.personFirst} ${alertR.personLast}</span> &mdash; ${LANG==='es'?alertR.reasonEs:alertR.reasonEn}</div>
+      <div class="hero-alert-person">
+        <div class="hero-alert-avatar" style="background:${alertR.avatarColor}">${alertR.personFirst[0]}${alertR.personLast[0]}</div>
+        <div><div class="hero-alert-name">${alertR.personFirst} ${alertR.personLast}</div><div class="hero-alert-sub">${LANG==='es'?alertR.deptEs:alertR.dept} &middot; ${LANG==='es'?alertR.agoEs:alertR.agoEn}</div></div>
+      </div>
+    </div>
+    <button class="hero-alert-cta" onclick="openDrawer('${alertR.id}')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      ${LANG==='es'?'Ver reporte':'View report'}
+    </button>`
+    :`<div style="color:var(--text-subtle);font-size:13px;text-align:center">${LANG==='es'?'Sin alertas críticas':'No critical alerts'}</div>`;
+
+  el.innerHTML=`
+    <div class="hero-panel-score">
+      <div class="hero-donut">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--bg-tertiary)" stroke-width="12"/>
+          <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--cond-${overallCond})" stroke-width="12"
+            stroke-dasharray="${filled.toFixed(1)} ${circumference.toFixed(1)}"
+            stroke-linecap="round" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="hero-donut-label">
+          <span class="hero-donut-value">${avgScore}%</span>
+          <span class="hero-donut-unit">${condLbls[overallCond]}</span>
+        </div>
+      </div>
+      <div class="hero-score-sub">
+        ${LANG==='es'?'Puntuación General':'Company Score'}<br>
+        <strong style="color:var(--cond-${overallCond})">${total}</strong> ${LANG==='es'?'métricas activas':'active metrics'}
+      </div>
+    </div>
+    <div class="hero-panel-dist">
+      <div class="hero-dist-title">${LANG==='es'?'Distribución de Condiciones':'Condition Distribution'}</div>
+      <div class="hero-dist-bar">${distBar}</div>
+      <div class="hero-dist-grid">${distRows}</div>
+      <div class="hero-dist-summary">
+        <strong style="color:var(--cond-normal)">${condCounts.normal}</strong> ${LANG==='es'?'en Normal':'Normal'} &middot;
+        <strong style="color:var(--cond-danger)">${condCounts.danger+condCounts.emergency}</strong> ${LANG==='es'?'requieren atención':'need attention'} &middot;
+        <strong style="color:var(--cond-power)">${condCounts.power}</strong> ${LANG==='es'?'en Poder':'Power'}
+      </div>
+    </div>
+    <div class="hero-panel-alert">${alertHtml}</div>`;
+}
+
+/* ── ASYMMETRIC KPI ROW ── */
+function renderAsymKpis() {
+  const topEl=document.getElementById('gm-kpis-top');
+  const botEl=document.getElementById('gm-kpis-bottom');
+  if(!topEl||!botEl)return;
+  const hk=GM_KPIS[0];
+  const colorVar=COND_COLORS[hk.condition]||'var(--cond-normal)';
+  const sparkSvg=hk.sparkline?drawSparkline(hk.sparkline,colorVar):'';
+  const valStr=hk.prefix+(typeof hk.value==='number'?hk.value.toLocaleString():hk.value)+hk.suffix;
+  const di=hk.deltaDir==='up'?'▲':hk.deltaDir==='down'?'▼':'—';
+  const dc=hk.deltaDir==='up'?'up':hk.deltaDir==='down'?'down':'flat';
+  const lbl=LANG==='es'?(hk.label_es||hk.label_en):hk.label_en;
+  const pcc=Math.min(hk.pct,100);
+  topEl.innerHTML=`
+    <div class="kpi-hero-card ${hk.condition}" onclick="openKpiDetail('${hk.id}')">
+      <div class="kpi-hero-left">
+        <div class="kpi-label" style="margin-bottom:12px">${lbl}</div>
+        <div class="kpi-hero-value">${valStr}</div>
+        <div class="kpi-hero-delta ${dc}">${di} ${hk.delta}${hk.suffix} <span class="kpi-hero-vstext">vs ${t('entry.goal_label')}</span></div>
+        <div class="kpi-hero-progress"><div class="kpi-progress-bar" style="width:${pcc}%;background:${colorVar}"></div></div>
+        <div class="kpi-meta"><span>${t('entry.goal_label')}: ${hk.prefix}${typeof hk.goal==='number'?hk.goal.toLocaleString():hk.goal}${hk.suffix}</span><span>${hk.pct}%</span></div>
+        <div style="margin-top:10px">${condBadge(hk.condition)}</div>
+      </div>
+      <div class="kpi-hero-right">
+        <div class="kpi-hero-chart">${sparkSvg}</div>
+        <div class="kpi-hero-annotation" style="color:${colorVar}">WTD ${hk.pct}%</div>
+      </div>
+    </div>
+    ${GM_KPIS.slice(1,4).map(k=>{
+      const cv=COND_COLORS[k.condition]||'var(--cond-normal)';
+      const sp=k.sparkline?drawSparkline(k.sparkline,cv):'';
+      const v=k.prefix+(typeof k.value==='number'?k.value.toLocaleString():k.value)+k.suffix;
+      const ddi=k.deltaDir==='up'?'▲':k.deltaDir==='down'?'▼':'—';
+      const ddc=k.deltaDir==='up'?'up':k.deltaDir==='down'?'down':'flat';
+      const llbl=LANG==='es'?(k.label_es||k.label_en):k.label_en;
+      const pc=Math.min(k.pct,100);
+      const ts=LANG==='es'?(k.updatedEs||k.updated):k.updated;
+      return`<div class="kpi-card ${k.condition}" onclick="openKpiDetail('${k.id}')">
+        <div class="kpi-sparkline">${sp}</div>
+        <div class="kpi-label">${llbl}</div>
+        <div class="kpi-value-row"><span class="kpi-value">${v}</span><span class="inline-delta ${ddc}">${ddi} ${k.delta}${k.suffix}</span></div>
+        <div class="kpi-progress"><div class="kpi-progress-bar" style="width:${pc}%"></div></div>
+        <div class="kpi-meta"><span>${t('entry.goal_label')}: ${k.prefix}${typeof k.goal==='number'?k.goal.toLocaleString():k.goal}${k.suffix}</span><span>${k.pct}%</span></div>
+        <div class="kpi-footer">${condBadge(k.condition)}<span class="kpi-timestamp">${ts}</span></div>
+      </div>`;
+    }).join('')}`;
+  botEl.innerHTML=GM_KPIS.slice(4).map(k=>{
+    const cv=COND_COLORS[k.condition]||'var(--cond-normal)';
+    const sp=k.sparkline?drawSparkline(k.sparkline,cv):'';
+    const v=k.prefix+(typeof k.value==='number'?k.value.toLocaleString():k.value)+k.suffix;
+    const ddi=k.deltaDir==='up'?'▲':k.deltaDir==='down'?'▼':'—';
+    const ddc=k.deltaDir==='up'?'up':k.deltaDir==='down'?'down':'flat';
+    const llbl=LANG==='es'?(k.label_es||k.label_en):k.label_en;
+    const pc=Math.min(k.pct,100);
+    const ts=LANG==='es'?(k.updatedEs||k.updated):k.updated;
+    const fn=LANG==='es'?(k.footnoteEs||k.footnote||''):(k.footnote||'');
+    return`<div class="kpi-card ${k.condition}" onclick="openKpiDetail('${k.id}')">
+      <div class="kpi-sparkline">${sp}</div>
+      <div class="kpi-label">${llbl}</div>
+      <div class="kpi-value-row"><span class="kpi-value">${v}</span><span class="inline-delta ${ddc}">${ddi} ${k.delta}${k.suffix}</span></div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width:${pc}%"></div></div>
+      <div class="kpi-meta"><span>${t('entry.goal_label')}: ${k.prefix}${typeof k.goal==='number'?k.goal.toLocaleString():k.goal}${k.suffix}</span><span>${k.pct}%</span></div>
+      <div class="kpi-footer">${condBadge(k.condition)}<span class="kpi-timestamp">${ts}</span></div>
+      ${fn?`<div class="kpi-footnote">${fn}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ── ROLE SWITCH ── */
+function setRole(role){
+  document.getElementById('role-gm').classList.toggle('active',role==='gm');
+  document.getElementById('role-rep').classList.toggle('active',role==='rep');
+  setView(role==='gm'?'gm-dashboard':'vendor-dashboard');
+}
+
+/* ── RENDER KPI GRID ── */
+function renderKpiGrid(containerId, kpis) {
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  el.innerHTML=kpis.map(k=>{
+    const colorVar=COND_COLORS[k.condition]||'var(--cond-normal)';
+    const sparkSvg=k.sparkline?drawSparkline(k.sparkline,colorVar):'';
+    const valStr=k.prefix+(typeof k.value==='number'?k.value.toLocaleString():k.value)+k.suffix;
+    const deltaIcon=k.deltaDir==='up'?'▲':k.deltaDir==='down'?'▼':'—';
+    const deltaClass=k.deltaDir==='up'?'up':k.deltaDir==='down'?'down':'flat';
+    const deltaStr=deltaIcon+' '+k.delta+(k.suffix||'');
+    const pctCapped=Math.min(k.pct,100);
+    const label=LANG==='es'?(k.label_es||k.label_en):k.label_en;
+    const ts=LANG==='es'?(k.updatedEs||k.updated):k.updated;
+    const fn=LANG==='es'?(k.footnoteEs||k.footnote||''):(k.footnote||'');
+    return `<div class="kpi-card ${k.condition}" onclick="openKpiDetail('${k.id}')">
+      <div class="kpi-sparkline">${sparkSvg}</div>
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value-row">
+        <span class="kpi-value">${valStr}</span>
+        <span class="inline-delta ${deltaClass}">${deltaStr}</span>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width:${pctCapped}%"></div></div>
+      <div class="kpi-meta">
+        <span>${t('entry.goal_label')}: ${k.prefix}${typeof k.goal==='number'?k.goal.toLocaleString():k.goal}${k.suffix}</span>
+        <span>${k.pct}%</span>
+      </div>
+      <div class="kpi-footer">${condBadge(k.condition)}<span class="kpi-timestamp">${ts}</span></div>
+      ${fn?`<div class="kpi-footnote">${fn}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ── RENDER VENDOR KPI (no sparkline) ── */
+function renderVendorKpis(containerId, kpis) {
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=kpis.map(k=>{
+    const pctCapped=Math.min(k.pct,100);
+    const label=LANG==='es'?(k.label_es||k.label_en):k.label_en;
+    return `<div class="kpi-card ${k.condition}">
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value-row">
+        <span class="kpi-value">${k.value}</span>
+        ${k.pct>=100?`<span class="inline-delta up">▲ ${k.pct}%</span>`:k.pct<70?`<span class="inline-delta down">▼ ${k.pct}%</span>`:`<span class="inline-delta flat">${k.pct}%</span>`}
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width:${pctCapped}%"></div></div>
+      <div class="kpi-meta">
+        <span>${t('entry.goal_label')}: ${k.goal}</span>
+        <span>${k.pct}%</span>
+      </div>
+      <div class="kpi-footer">${condBadge(k.condition)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── DEPT TABLE ── */
+function renderDeptTable() {
+  const el=document.getElementById('dept-table');
+  if(!el)return;
+  el.innerHTML=`<thead><tr>
+    <th>${t('table.dept')}</th><th>${t('table.leader')}</th>
+    <th style="text-align:right">${t('table.score')}</th>
+    <th>${t('table.metrics')}</th>
+    <th>${t('table.trend')}</th>
+    <th>${t('table.condition')}</th>
+  </tr></thead><tbody>${DEPARTMENTS.map(d=>{
+    const name=LANG==='es'?d.nameEs:d.name;
+    const trendColor=COND_COLORS[d.condition]||'var(--cond-normal)';
+    return `<tr>
+      <td><span class="dept-name">${name}</span></td>
+      <td style="color:var(--text-subtle)">${d.leader}</td>
+      <td class="num" style="color:${trendColor}">${d.score}%</td>
+      <td><span style="color:var(--cond-normal);font-weight:600">${d.met.split('/')[0]}</span><span style="color:var(--text-subtle)">/${d.met.split('/')[1]} </span><span style="color:var(--text-disabled);font-size:11px">met</span></td>
+      <td><div class="dept-trend">${drawTrendSparkline(d.trend,trendColor)}</div></td>
+      <td>${condBadge(d.condition)}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+}
+
+/* ── SALES TABLE ── */
+function renderSalesTable(containerId) {
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const sorted=[...SALES_TEAM].sort((a,b)=>b.wtd-a.wtd);
+  el.innerHTML=`<thead><tr>
+    <th>#</th><th>${t('table.vendor')}</th><th>${t('table.role')}</th><th>${t('table.location')}</th>
+    <th style="text-align:right">${t('table.sales')}</th>
+    <th style="min-width:100px">${t('table.pct')}</th>
+    <th style="text-align:right">${t('table.quotes')}</th>
+    <th style="text-align:right">${t('table.conv')}</th>
+    <th>${t('table.condition')}</th>
+  </tr></thead><tbody>${sorted.map((v,i)=>{
+    const pct=Math.round(v.wtd/v.goal*100);
+    const condColor=COND_COLORS[v.condition]||'var(--cond-normal)';
+    const ini=initials(v.name);
+    const avatarBg=v.you?'#1E7FCC':v.condition==='power'?'#7C3AED':v.condition==='danger'?'#B91C1C':v.condition==='emergency'?'#EA580C':'#334155';
+    const posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    return `<tr style="${v.you?'background:rgba(30,127,204,0.04)':''}">
+      <td><span class="lb-pos ${posClass}" style="display:inline-block">${i+1}</span></td>
+      <td><div class="vendor-row-avatar">
+        <div class="avatar-chip" style="background:${avatarBg}">${ini}</div>
+        <div>
+          <span style="font-weight:600;color:var(--text-primary)">${v.name}</span>
+          ${v.you?`<span style="font-size:11px;color:var(--brand-blue);margin-left:5px">(${t('vendor.you')})</span>`:''}
+        </div>
+      </div></td>
+      <td style="color:var(--text-subtle);font-size:12px">${v.role}</td>
+      <td style="color:var(--text-subtle)">${v.loc}</td>
+      <td class="num">$${v.wtd.toLocaleString()}</td>
+      <td>
+        <div class="table-progress-wrap">
+          <div style="font-size:11px;color:${condColor};font-weight:600;margin-bottom:3px;font-family:'JetBrains Mono',monospace">${pct}%</div>
+          <div class="table-progress-track"><div class="table-progress-fill" style="width:${Math.min(pct,100)}%;background:${condColor}"></div></div>
+        </div>
+      </td>
+      <td class="num">${v.quotes}</td>
+      <td class="num">${v.conv}%</td>
+      <td>${condBadge(v.condition)}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+}
+
+/* ── QUICK INBOX ── */
+function renderQuickInbox() {
+  const el=document.getElementById('quick-inbox');
+  if(!el)return;
+  el.innerHTML=INBOX_REPORTS.slice(0,4).map(r=>`
+    <div class="inbox-item" onclick="openDrawer('${r.id}')">
+      <div class="inbox-cond-dot" style="background:var(--cond-${r.condition})"></div>
+      <div class="inbox-item-body">
+        <div class="inbox-item-title">${r.personFirst} ${r.personLast} &mdash; ${LANG==='es'?r.deptEs:r.dept}</div>
+        <div class="inbox-item-sub">${LANG==='es'?r.reasonEs:r.reasonEn}</div>
+        <div class="inbox-item-meta">${LANG==='es'?r.agoEs:r.agoEn}</div>
+      </div>
+      <button class="inbox-item-action">${t('filter.all')==='Todos'?'Ver':'View'}</button>
+    </div>`).join('');
+}
+
+/* ── INBOX FILTER ── */
+let inboxFilter='all';
+function renderFilterChips() {
+  const el=document.getElementById('filter-chips');
+  if(!el)return;
+  const counts={all:INBOX_REPORTS.length,danger:0,emergency:0,power:0};
+  INBOX_REPORTS.forEach(r=>{if(counts[r.condition]!==undefined)counts[r.condition]++;});
+  const chips=[
+    {key:'all',label:t('filter.all')},
+    {key:'danger',label:t('filter.danger')},
+    {key:'emergency',label:t('filter.emergency')},
+    {key:'power',label:t('filter.power')},
+  ];
+  el.innerHTML=chips.map(c=>`
+    <button class="filter-chip ${inboxFilter===c.key?'active':''}" onclick="setInboxFilter('${c.key}')">
+      ${c.label}<span class="filter-chip-count">${counts[c.key]}</span>
+    </button>`).join('');
+}
+function setInboxFilter(f){inboxFilter=f;renderFilterChips();renderInboxRows();}
+
+/* ── INBOX ROWS ── */
+function renderInboxRows() {
+  const el=document.getElementById('inbox-rows');
+  if(!el)return;
+  const rows=INBOX_REPORTS.filter(r=>inboxFilter==='all'||r.condition===inboxFilter);
+  el.innerHTML=rows.map(r=>`
+    <div class="inbox-row" onclick="openDrawer('${r.id}')">
+      <div class="inbox-row-dot" style="background:var(--cond-${r.condition})"></div>
+      <div class="inbox-row-avatar" style="background:${r.avatarColor}">${r.personFirst[0]}${r.personLast[0]}</div>
+      <div class="inbox-row-body">
+        <div class="inbox-row-title">${r.personFirst} ${r.personLast} &mdash; ${LANG==='es'?r.metricEs:r.metricEn}</div>
+        <div class="inbox-row-sub">${LANG==='es'?r.reasonEs:r.reasonEn} &middot; ${LANG==='es'?r.deptEs:r.dept}</div>
+      </div>
+      ${condBadge(r.condition)}
+      <div class="inbox-row-time">${LANG==='es'?r.agoEs:r.agoEn}</div>
+    </div>`).join('');
+}
+
+/* ── DRAWER ── */
+function openDrawer(id) {
+  const r=INBOX_REPORTS.find(x=>x.id===id);
+  if(!r)return;
+  const isEs=LANG==='es';
+  const condColor=`var(--cond-${r.condition})`;
+  const stepColors={danger:'var(--cond-danger)',emergency:'var(--cond-emergency)',power:'var(--cond-power)',normal:'var(--cond-normal)',affluence:'var(--cond-affluence)'};
+  const stepBg=stepColors[r.condition]||'var(--cond-emergency)';
+
+  // Header
+  const headerHTML=`
+    <div style="width:40px;height:40px;border-radius:50%;background:${r.avatarColor};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0">${r.personFirst[0]}${r.personLast[0]}</div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span class="tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          ${t('report.ai_generated')}
+        </span>
+        ${condBadge(r.condition)}
+      </div>
+      <div style="font-size:15px;font-weight:700;color:var(--text-primary)">${r.personFirst} ${r.personLast}</div>
+      <div style="font-size:12px;color:var(--text-subtle);margin-top:2px">${isEs?r.deptEs:r.dept} &middot; ${isEs?r.agoEs:r.agoEn}</div>
+    </div>
+    <button onclick="closeDrawer()" style="color:var(--text-subtle);padding:4px;border-radius:var(--r-sm);transition:background var(--dur-fast)" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='none'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>`;
+
+  // Body
+  const condScaleSegments=['danger','emergency','normal','affluence','power']
+    .map(s=>`<div class="seg ${s} ${s===r.condition?'active':''}"></div>`).join('');
+  const condScaleLabels=isEs
+    ?['Peligro','Emergencia','Normal','Afluencia','Poder']
+    :['Danger','Emergency','Normal','Affluence','Power'];
+
+  const bodyHTML=`
+    <div class="drawer-section" style="border-left:3px solid ${condColor}">
+      <div class="drawer-section-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        ${isEs?r.metricEs:r.metricEn}
+      </div>
+      <div class="stat-pair">
+        <div class="stat-block cond-colored" style="border-left-color:${condColor}">
+          <div class="stat-label">${t('report.value')}</div>
+          <div class="stat-value" style="color:${condColor}">${r.currentValue}</div>
+          <div class="stat-sub">${r.trendNote}</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">${t('report.goal')}</div>
+          <div class="stat-value">${r.goalValue}</div>
+          <div class="stat-sub">${r.pctOfGoal} ${t('report.pct_goal')}</div>
+        </div>
+      </div>
+      <div class="cond-scale">${condScaleSegments}</div>
+      <div class="cond-scale-labels">${condScaleLabels.map(l=>`<span>${l}</span>`).join('')}</div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        ${t('report.analysis')}
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.65">${isEs?r.analysisEs:r.analysisEn}</p>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        ${t('report.action_plan')} &mdash; ${r.formula}
+      </div>
+      ${r.steps.map((s,i)=>`
+        <div class="action-step" style="border-left-color:${stepBg}">
+          <div class="step-num" style="background:${stepBg}">${i+1}</div>
+          <div style="flex:1">
+            <div class="step-verb" style="color:${condColor}">${isEs?s.verbEs:s.verb}</div>
+            <div class="step-body">${isEs?s.es:s.en}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        ${t('report.gm_notes')}
+      </div>
+      <textarea class="gm-notes-textarea" placeholder="${t('report.gm_notes_ph')}"></textarea>
+    </div>`;
+
+  // Footer
+  const footerHTML=`
+    <button class="btn btn-ghost" onclick="closeDrawer();alert(LANG==='es'?'Reporte rechazado':'Report rejected')">${t('action.reject')}</button>
+    <button class="btn btn-secondary" onclick="closeDrawer();alert(LANG==='es'?'Diferido 24h':'Snoozed 24h')">${t('action.defer')}</button>
+    <button class="btn btn-secondary">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      ${t('action.edit')}
+    </button>
+    <button class="btn btn-success" onclick="approveReport('${r.id}')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      ${t('action.approve')}
+    </button>`;
+
+  document.getElementById('drawer-header').innerHTML=headerHTML;
+  document.getElementById('drawer-body').innerHTML=bodyHTML;
+  document.getElementById('drawer-footer').innerHTML=footerHTML;
+  document.getElementById('drawer-backdrop').classList.add('open');
+  document.getElementById('report-drawer').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer-backdrop').classList.remove('open');
+  document.getElementById('report-drawer').classList.remove('open');
+}
+function approveReport(id){
+  closeDrawer();
+  const r=INBOX_REPORTS.find(x=>x.id===id);
+  alert(LANG==='es'?`Reporte aprobado y enviado a ${r?r.personFirst+' '+r.personLast:'equipo'}.`:`Report approved and sent to ${r?r.personFirst+' '+r.personLast:'team'}.`);
+  setView('inbox');
+}
+function openKpiDetail(id){
+  const r=INBOX_REPORTS.find(x=>x.id===id);
+  if(r)openDrawer(id);
+}
+
+/* ── VENDOR DASHBOARD ── */
+function renderVendorDashboard() {
+  const me=SALES_TEAM.find(x=>x.you);
+  if(!me)return;
+  const firstName=me.name.split(' ')[0];
+  const overallCond=me.condition;
+  document.getElementById('vendor-greeting').textContent=LANG==='es'?`Hola, ${firstName}!`:`Hello, ${firstName}!`;
+  document.getElementById('vendor-greeting-sub').textContent=LANG==='es'?'Esta es tu semana · Semana 21, 17–23 Mayo 2026':"This is your week · Week 21, May 17–23, 2026";
+  const banner=document.getElementById('vendor-banner');
+  if(banner){
+    const statusMsg=overallCond==='emergency'||overallCond==='danger'?t('vendor.status_emergency'):t('vendor.status_normal');
+    banner.style.borderLeftColor=`var(--cond-${overallCond})`;
+    banner.innerHTML=`<div style="display:flex;align-items:center;gap:12px">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--cond-${overallCond});flex-shrink:0"></div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary)">${firstName} Smith &mdash; ${condBadge(overallCond)}</div>
+        <div style="font-size:12px;color:var(--text-subtle);margin-top:2px">${statusMsg}</div>
+      </div>
+    </div>`;
+  }
+  renderVendorKpis('vendor-kpis', MY_METRICS);
+  document.getElementById('plan-items').innerHTML=PLAN_ITEMS.map(p=>`
+    <div class="plan-item">
+      <div class="plan-check ${p.done?'done':''}"></div>
+      <span style="${p.done?'text-decoration:line-through;opacity:0.5':''}">${LANG==='es'?p.text_es:p.text_en}</span>
+    </div>`).join('');
+  const lb=document.getElementById('leaderboard');
+  if(lb){
+    const sorted=[...SALES_TEAM].sort((a,b)=>b.wtd-a.wtd);
+    lb.innerHTML=sorted.slice(0,6).map((v,i)=>{
+      const ini=initials(v.name);
+      const pctW=Math.round(v.wtd/v.goal*100);
+      const posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+      const avatarBg=v.condition==='power'?'#7C3AED':v.you?'#1E7FCC':v.condition==='danger'?'#B91C1C':'#334155';
+      return `<div class="lb-row ${v.you?'you':''}">
+        <div class="lb-pos ${posClass}">${i+1}</div>
+        <div class="avatar-chip" style="background:${avatarBg};width:26px;height:26px;font-size:10px">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--text-primary)">${v.name}${v.you?` <span style="color:var(--brand-blue);font-size:11px">(${t('vendor.you')})</span>`:''}</div>
+          <div style="font-size:11px;color:var(--text-subtle)">${v.loc} &middot; ${pctW}% ${t('entry.goal_label')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--text-primary)">$${v.wtd.toLocaleString()}</div>
+          <div style="margin-top:2px">${condBadge(v.condition)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ── MANUAL ENTRY ── */
+function renderEntryFields() {
+  const el=document.getElementById('entry-fields');
+  if(!el)return;
+  el.innerHTML=ENTRY_FIELDS.map(f=>`
+    <div class="entry-card">
+      <div class="entry-label">${LANG==='es'?f.label_es:f.label_en}</div>
+      <div class="entry-sublabel">${t('entry.goal_label')}: ${f.unit}${f.goal}</div>
+      <div class="entry-row">
+        <span style="font-size:16px;font-weight:600;color:var(--text-subtle)">${f.unit}</span>
+        <input class="entry-input" type="number" inputmode="decimal" value="${f.prev}" id="entry-${f.key}">
+        <span class="entry-goal">${t('entry.goal_label')}: ${f.unit}${f.goal}</span>
+      </div>
+      ${f.note_en?`<textarea class="gm-notes-textarea" style="margin-top:10px;min-height:56px" placeholder="${LANG==='es'?f.note_es:f.note_en}"></textarea>`:''}
+    </div>`).join('');
+}
+function saveEntry(){
+  alert(LANG==='es'?'Métricas guardadas correctamente.\n\nSemana 21 — John Smith':'Metrics saved successfully.\n\nWeek 21 — John Smith');
+  setView('vendor-dashboard');
+}
+
+/* ── SALES CHART ── */
+function drawSalesChart() {
+  const svg=document.getElementById('sales-chart');
+  if(!svg)return;
+  const W=680,H=220,padL=50,padR=24,padT=16,padB=36;
+  const n=SALES_CHART_DATA.length;
+  const reals=SALES_CHART_DATA.map(d=>d.real);
+  const goals=SALES_CHART_DATA.map(d=>d.goal);
+  const minV=Math.min(...reals)*0.85;
+  const maxV=Math.max(...goals)*1.1;
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gridColor=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+  const textColor=isDark?'#94A3B8':'#64748B';
+  const xS=i=>padL+(i/(n-1))*(W-padL-padR);
+  const yS=v=>padT+(1-(v-minV)/(maxV-minV))*(H-padT-padB);
+  const yVals=[60,75,90,105,120].filter(v=>v>=minV&&v<=maxV*1.05);
+  const grids=yVals.map(v=>`
+    <line x1="${padL}" x2="${W-padR}" y1="${yS(v)}" y2="${yS(v)}" stroke="${gridColor}" stroke-width="1"/>
+    <text x="${padL-6}" y="${yS(v)+4}" fill="${textColor}" font-size="10" font-family="JetBrains Mono" text-anchor="end">$${v}k</text>`).join('');
+  const xlabels=SALES_CHART_DATA.map((d,i)=>`<text x="${xS(i)}" y="${H-6}" fill="${textColor}" font-size="9.5" font-family="Inter" text-anchor="middle">${d.w}</text>`).join('');
+  const pts=SALES_CHART_DATA.map((d,i)=>({x:xS(i),y:yS(d.real)}));
+  const goalPts=SALES_CHART_DATA.map((d,i)=>({x:xS(i),y:yS(d.goal)}));
+  const linePath='M'+pts.map(p=>p.x+','+p.y).join('L');
+  const areaPath=linePath+'L'+pts[n-1].x+','+yS(minV)+'L'+pts[0].x+','+yS(minV)+'Z';
+  const goalPath='M'+goalPts.map(p=>p.x+','+p.y).join('L');
+  const dots=pts.map((p,i)=>i===n-1
+    ?`<circle cx="${p.x}" cy="${p.y}" r="5" fill="#E11D24" stroke="${isDark?'#020617':'#fff'}" stroke-width="2"/>`
+    :`<circle cx="${p.x}" cy="${p.y}" r="3" fill="#1E7FCC" stroke="${isDark?'#020617':'#fff'}" stroke-width="1.5"/>`).join('');
+  const lastPt=pts[n-1];
+  svg.innerHTML=`<defs>
+    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E7FCC" stop-opacity="${isDark?'0.25':'0.12'}"/>
+      <stop offset="100%" stop-color="#1E7FCC" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${grids}${xlabels}
+    <path d="${areaPath}" fill="url(#areaGrad)"/>
+    <path d="${goalPath}" fill="none" stroke="${textColor}" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <path d="${linePath}" fill="none" stroke="#1E7FCC" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    <text x="${lastPt.x}" y="${lastPt.y-10}" fill="${textColor}" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="600">$84k</text>`;
+}
+
+/* ── THRESHOLD PREVIEW ── */
+function renderThresholdPreview(){/* static for now */}
+
+/* ── THEME ── */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('theme-icon-moon').style.display=isDark?'none':'';
+  document.getElementById('theme-icon-sun').style.display=isDark?'':'none';
+  setTimeout(drawSalesChart,50);
+}
+
+/* ── LANG ── */
+function setLang(lang){
+  LANG=lang;
+  document.getElementById('lang-en').classList.toggle('active',lang==='en');
+  document.getElementById('lang-es').classList.toggle('active',lang==='es');
+  const sph=document.getElementById('search-ph');
+  if(sph)sph.textContent=lang==='es'?'Buscar métricas, reportes...':'Search metrics, reports...';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(T[lang][k])el.textContent=T[lang][k];
+  });
+  renderAll();
+}
+
+/* ── NAV ── */
+const VIEW_TITLES={'gm-dashboard':{en:'GM Dashboard',es:'Dashboard GM'},'sales':{en:'Sales',es:'Ventas'},'vendor-dashboard':{en:'My Dashboard',es:'Mi Dashboard'},'inbox':{en:'AI Inbox',es:'Inbox IA'},'manual-entry':{en:'Log Metrics',es:'Registrar Métricas'},'thresholds':{en:'Thresholds',es:'Umbrales'},'marketing':{en:'Marketing',es:'Marketing'},'finance':{en:'Finance',es:'Finanzas'},'cx':{en:'Customer Service',es:'Servicio al Cliente'}};
+const NAV_MAP={'gm-dashboard':'nav-gm-dashboard','sales':'nav-sales','vendor-dashboard':'nav-vendor','inbox':'nav-inbox','manual-entry':'nav-entry','thresholds':'nav-thresholds','marketing':'nav-marketing','finance':'nav-finance','cx':'nav-cx'};
+function setView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('view-'+name);
+  if(el)el.classList.add('active');
+  const nav=document.getElementById(NAV_MAP[name]);
+  if(nav)nav.classList.add('active');
+  const tt=VIEW_TITLES[name];
+  if(tt)document.getElementById('breadcrumb-text').textContent=tt[LANG]||tt.en;
+  if(isMobile())closeMobileSidebar();
+  window.scrollTo(0,0);
+}
+function isMobile(){return window.innerWidth<=768;}
+function closeMobileSidebar(){
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('mobile-backdrop').classList.remove('open');
+}
+function toggleSidebar(){
+  const sidebar=document.getElementById('sidebar');
+  if(isMobile()){
+    const open=sidebar.classList.toggle('mobile-open');
+    document.getElementById('mobile-backdrop').classList.toggle('open',open);
+  } else {
+    sidebar.classList.remove('mobile-open');
+    sidebar.classList.toggle('collapsed');
+    const collapsed=sidebar.classList.contains('collapsed');
+    document.getElementById('icon-collapse').style.display=collapsed?'none':'';
+    document.getElementById('icon-expand').style.display=collapsed?'':'none';
+    document.getElementById('sidebar-toggle-btn').title=collapsed?'Expandir menú':'Colapsar menú';
+  }
+}
+window.addEventListener('resize',()=>{if(!isMobile())closeMobileSidebar();});
+
+const PERIODS=['Week 21 · May 17–23','Week 20 · May 10–16','May 2026','Q2 2026','YTD 2026'];
+let periodIdx=0;
+function cyclePeriod(el){periodIdx=(periodIdx+1)%PERIODS.length;document.getElementById('period-label').textContent=PERIODS[periodIdx];}
+
+/* ── MARKETING ── */
+function renderMarketing() {
+  renderKpiGrid('mktg-kpis', MARKETING_KPIS);
+  const isEs = LANG === 'es';
+  const camp = document.getElementById('mktg-campaigns');
+  if(camp) camp.innerHTML = `<thead><tr>
+    <th>${isEs?'Campaña':'Campaign'}</th>
+    <th style="text-align:right">${isEs?'Presupuesto':'Budget'}</th>
+    <th style="text-align:right">${isEs?'Gastado':'Spent'}</th>
+    <th style="text-align:right">Leads</th>
+    <th style="text-align:right">CPA</th>
+    <th>${isEs?'Tendencia':'Trend'}</th>
+    <th>${isEs?'Condición':'Condition'}</th>
+  </tr></thead><tbody>${CAMPAIGNS.map(c=>{
+    const color = COND_COLORS[c.condition]||'var(--cond-normal)';
+    return `<tr>
+      <td style="font-weight:600;color:var(--text-primary)">${c.name}</td>
+      <td class="num">$${c.budget.toLocaleString()}</td>
+      <td class="num">$${c.spent.toLocaleString()}</td>
+      <td class="num">${c.leads}</td>
+      <td class="num" style="color:${color}">$${c.cpa}</td>
+      <td><div style="width:64px;height:22px;display:inline-block">${drawTrendSparkline(c.trend,color)}</div></td>
+      <td>${condBadge(c.condition)}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+  const ch = document.getElementById('mktg-channels');
+  if(ch) {
+    const channels = [
+      {name:'Google Ads',pct:38,color:'#4285F4',spend:'$3,000'},
+      {name:'Meta Ads',pct:24,color:'#1877F2',spend:'$1,800'},
+      {name:'SEO / Orgánico',pct:20,color:'var(--cond-power)',spend:'$800'},
+      {name:'Email',pct:10,color:'var(--cond-affluence)',spend:'$400'},
+      {name:'Directo',pct:8,color:'var(--cond-normal)',spend:'$320'},
+    ];
+    ch.innerHTML = channels.map(c=>`
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:13px;font-weight:500;color:var(--text-secondary)">${c.name}</span>
+          <span style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-subtle)">${c.pct}% · ${c.spend}</span>
+        </div>
+        <div style="height:6px;background:var(--bg-tertiary);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${c.pct}%;background:${c.color};border-radius:99px;transition:width 600ms"></div>
+        </div>
+      </div>`).join('');
+  }
+  const t1 = document.getElementById('mktg-camp-title');
+  if(t1) t1.textContent = isEs ? 'Campañas Activas' : 'Active Campaigns';
+  const t2 = document.getElementById('mktg-channel-title');
+  if(t2) t2.textContent = isEs ? 'Mix de Canales' : 'Channel Mix';
+  const sub = document.getElementById('mktg-sub');
+  if(sub) sub.textContent = `Ravi Patel · Score: 71% · ${isEs?'Semana 21':'Week 21'}`;
+}
+
+/* ── FINANCE ── */
+function renderFinance() {
+  renderKpiGrid('fin-kpis', FINANCE_KPIS);
+  const isEs = LANG === 'es';
+  const exp = document.getElementById('fin-expenses');
+  if(exp) exp.innerHTML = `<thead><tr>
+    <th>${isEs?'Categoría':'Category'}</th>
+    <th style="text-align:right">${isEs?'Monto':'Amount'}</th>
+    <th style="min-width:100px">% ${isEs?'del total':'of total'}</th>
+    <th>${isEs?'Tendencia':'Trend'}</th>
+    <th>${isEs?'Condición':'Condition'}</th>
+  </tr></thead><tbody>${EXPENSE_BREAKDOWN.map(e=>{
+    const color = COND_COLORS[e.condition]||'var(--cond-normal)';
+    const cat = isEs ? e.cat_es : e.cat_en;
+    return `<tr>
+      <td style="font-weight:600;color:var(--text-primary)">${cat}</td>
+      <td class="num">$${e.amount.toLocaleString()}</td>
+      <td>
+        <div style="font-size:11px;font-weight:600;color:${color};margin-bottom:3px;font-family:'JetBrains Mono',monospace">${e.pct}%</div>
+        <div class="table-progress-track"><div class="table-progress-fill" style="width:${e.pct}%;background:${color}"></div></div>
+      </td>
+      <td><div style="width:64px;height:22px;display:inline-block">${drawTrendSparkline(e.trend,color)}</div></td>
+      <td>${condBadge(e.condition)}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+  const t1 = document.getElementById('fin-exp-title');
+  if(t1) t1.textContent = isEs ? 'Desglose de Costos' : 'Cost Breakdown';
+  const t2 = document.getElementById('fin-title');
+  if(t2) t2.textContent = isEs ? 'Finanzas' : 'Finance';
+  const sub = document.getElementById('fin-sub');
+  if(sub) sub.textContent = `Linda Park · Score: 95% · ${isEs?'Semana 21':'Week 21'}`;
+}
+
+/* ── CUSTOMER SERVICE ── */
+function renderCX() {
+  renderKpiGrid('cx-kpis', CX_KPIS);
+  const isEs = LANG === 'es';
+  const tk = document.getElementById('cx-tickets');
+  if(tk) tk.innerHTML = `<thead><tr>
+    <th>ID</th>
+    <th>${isEs?'Cliente':'Client'}</th>
+    <th>${isEs?'Problema':'Issue'}</th>
+    <th style="text-align:right">${isEs?'Días':'Days'}</th>
+    <th>${isEs?'Agente':'Agent'}</th>
+    <th>${isEs?'Prioridad':'Priority'}</th>
+    <th>${isEs?'Condición':'Condition'}</th>
+  </tr></thead><tbody>${CX_TICKETS.map(t=>`<tr>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-subtle)">${t.id}</td>
+    <td style="font-weight:600;color:var(--text-primary)">${t.client}</td>
+    <td style="max-width:260px;color:var(--text-secondary)">${isEs?t.issue_es:t.issue_en}</td>
+    <td class="num" style="color:${t.age>=5?'var(--cond-danger)':t.age>=2?'var(--cond-emergency)':'var(--cond-normal)'}">${t.age}d</td>
+    <td style="color:var(--text-subtle)">${t.agent}</td>
+    <td><span style="font-size:11px;font-weight:600;color:${t.priority==='Alta'?'var(--cond-danger)':t.priority==='Media'?'var(--cond-emergency)':'var(--cond-normal)'}">${t.priority}</span></td>
+    <td>${condBadge(t.condition)}</td>
+  </tr>`).join('')}</tbody>`;
+  const t1 = document.getElementById('cx-tickets-title');
+  if(t1) t1.textContent = isEs ? 'Tickets Abiertos' : 'Open Tickets';
+  const t2 = document.getElementById('cx-title');
+  if(t2) t2.textContent = isEs ? 'Servicio al Cliente' : 'Customer Service';
+  const sub = document.getElementById('cx-sub');
+  if(sub) sub.textContent = `Jordan Ellis · Score: 48% · ${isEs?'Semana 21':'Week 21'}`;
+}
+
+/* ── RENDER ALL ── */
+function renderAll(){
+  renderHeroPanel();
+  renderAsymKpis();
+  renderDeptTable();
+  renderSalesTable('vendor-table-gm');
+  renderSalesTable('vendor-table-full');
+  renderQuickInbox();
+  renderFilterChips();
+  renderInboxRows();
+  renderVendorDashboard();
+  renderEntryFields();
+  renderMarketing();
+  renderFinance();
+  renderCX();
+  drawSalesChart();
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(T[LANG]&&T[LANG][k])el.textContent=T[LANG][k];
+  });
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  renderAll();
+  let rt;
+  window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(drawSalesChart,100);});
+  setLang('es');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+</script>
+</body>
+</html>
