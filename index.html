@@ -565,6 +565,28 @@ svg{flex-shrink:0;}
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a1 1 0 00-.12.12M4.93 4.93a1 1 0 01.12.12M4.93 19.07a1 1 0 00.12-.12M19.07 19.07a1 1 0 01-.12-.12M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
         <span class="nav-label" data-i18n="nav.thresholds">Thresholds</span>
       </div>
+      <div class="sidebar-section-label" data-i18n="nav.section.organization">Organización</div>
+      <div class="nav-item" onclick="setView('knowledge')" id="nav-knowledge">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <span class="nav-label" data-i18n="nav.knowledge">Conocimiento</span>
+      </div>
+      <div class="nav-item" onclick="setView('meetings')" id="nav-meetings">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span class="nav-label" data-i18n="nav.meetings">Acuerdos y Actas</span>
+      </div>
+      <div class="nav-item" onclick="setView('directory')" id="nav-directory">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="nav-label" data-i18n="nav.directory">Directorio</span>
+      </div>
+      <div class="sidebar-section-label" data-i18n="nav.section.operations">Operaciones</div>
+      <div class="nav-item" onclick="setView('installers')" id="nav-installers">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/><path d="M2 16l5-5 4 4 4-5 5 5"/></svg>
+        <span class="nav-label" data-i18n="nav.installers">Instaladores</span>
+      </div>
+      <div class="nav-item" onclick="setView('expirations')" id="nav-expirations">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14v4"/><path d="M10 16h4"/></svg>
+        <span class="nav-label" data-i18n="nav.expirations">Vencimientos</span>
+      </div>
       <div class="sidebar-section-label" style="margin-top:8px"></div>
       <div class="nav-item" onclick="setView('vendor-dashboard')" id="nav-vendor">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -884,6 +906,65 @@ svg{flex-shrink:0;}
             <table class="data-table" id="cx-installers"></table>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ── MODULE 2: CONOCIMIENTO ── -->
+    <div class="view page-content" id="view-knowledge">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="knowledge-title">Base de Conocimiento</div>
+        <div class="greeting-sub" id="knowledge-sub">SOPs · Manuales · Scripts · Políticas</div>
+      </div>
+      <div id="knowledge-type-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px"></div>
+      <div class="section-header"><span class="section-title" id="knowledge-docs-title">DOCUMENTOS RECIENTES</span></div>
+      <div class="data-card">
+        <table class="data-table" id="knowledge-table"></table>
+      </div>
+    </div>
+
+    <!-- ── MODULE 3: ACUERDOS Y ACTAS ── -->
+    <div class="view page-content" id="view-meetings">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="meetings-title">Acuerdos y Actas</div>
+        <div class="greeting-sub" id="meetings-sub">Reuniones · Tareas · Accountability</div>
+      </div>
+      <div class="kpi-grid" id="meetings-kpis" style="margin-bottom:24px"></div>
+      <div class="section-header"><span class="section-title" id="meetings-list-title">REUNIONES REGISTRADAS</span></div>
+      <div id="meetings-list"></div>
+    </div>
+
+    <!-- ── MODULE 7: DIRECTORIO ── -->
+    <div class="view page-content" id="view-directory">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="directory-title">Directorio Interno</div>
+        <div class="greeting-sub" id="directory-sub">Equipo Aromaz · Todos los departamentos</div>
+      </div>
+      <div id="directory-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px"></div>
+    </div>
+
+    <!-- ── MODULE 9: INSTALADORES ── -->
+    <div class="view page-content" id="view-installers">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="installers-title">Gestión de Instaladores</div>
+        <div class="greeting-sub" id="installers-sub">In-house · Subcontratistas · Condición Hubbard</div>
+      </div>
+      <div class="kpi-grid" id="installers-kpis" style="margin-bottom:24px"></div>
+      <div class="section-header"><span class="section-title" id="installers-table-title">EQUIPO DE INSTALACIÓN</span></div>
+      <div class="data-card">
+        <table class="data-table" id="installers-table"></table>
+      </div>
+    </div>
+
+    <!-- ── MODULE 11: VENCIMIENTOS ── -->
+    <div class="view page-content" id="view-expirations">
+      <div class="greeting-strip">
+        <div class="greeting-title" id="expirations-title">Vencimientos y Obligaciones</div>
+        <div class="greeting-sub" id="expirations-sub">Seguros · Licencias · Contratos · Software</div>
+      </div>
+      <div class="kpi-grid" id="expirations-kpis" style="margin-bottom:24px"></div>
+      <div class="section-header"><span class="section-title" id="expirations-table-title">OBLIGACIONES — POR FECHA DE VENCIMIENTO</span></div>
+      <div class="data-card">
+        <table class="data-table" id="expirations-table"></table>
       </div>
     </div>
 
@@ -1912,8 +1993,8 @@ function setLang(lang){
 }
 
 /* ── NAV ── */
-const VIEW_TITLES={'gm-dashboard':{en:'GM Dashboard',es:'Dashboard GM'},'sales':{en:'Sales',es:'Ventas'},'vendor-dashboard':{en:'My Dashboard',es:'Mi Dashboard'},'inbox':{en:'AI Inbox',es:'Inbox IA'},'manual-entry':{en:'Log Metrics',es:'Registrar Métricas'},'thresholds':{en:'Thresholds',es:'Umbrales'},'marketing':{en:'Marketing',es:'Marketing'},'finance':{en:'Finance',es:'Finanzas'},'cx':{en:'Customer Service',es:'Servicio al Cliente'},'products':{en:'Products',es:'Productos'}};
-const NAV_MAP={'gm-dashboard':'nav-gm-dashboard','sales':'nav-sales','vendor-dashboard':'nav-vendor','inbox':'nav-inbox','manual-entry':'nav-entry','thresholds':'nav-thresholds','marketing':'nav-marketing','finance':'nav-finance','cx':'nav-cx','products':'nav-products'};
+const VIEW_TITLES={'gm-dashboard':{en:'GM Dashboard',es:'Dashboard GM'},'sales':{en:'Sales',es:'Ventas'},'vendor-dashboard':{en:'My Dashboard',es:'Mi Dashboard'},'inbox':{en:'AI Inbox',es:'Inbox IA'},'manual-entry':{en:'Log Metrics',es:'Registrar Métricas'},'thresholds':{en:'Thresholds',es:'Umbrales'},'marketing':{en:'Marketing',es:'Marketing'},'finance':{en:'Finance',es:'Finanzas'},'cx':{en:'Customer Service',es:'Servicio al Cliente'},'products':{en:'Products',es:'Productos'},'knowledge':{en:'Knowledge Base',es:'Base de Conocimiento'},'meetings':{en:'Meetings & Agreements',es:'Acuerdos y Actas'},'directory':{en:'Internal Directory',es:'Directorio Interno'},'installers':{en:'Installers',es:'Instaladores'},'expirations':{en:'Expirations',es:'Vencimientos'}};
+const NAV_MAP={'gm-dashboard':'nav-gm-dashboard','sales':'nav-sales','vendor-dashboard':'nav-vendor','inbox':'nav-inbox','manual-entry':'nav-entry','thresholds':'nav-thresholds','marketing':'nav-marketing','finance':'nav-finance','cx':'nav-cx','products':'nav-products','knowledge':'nav-knowledge','meetings':'nav-meetings','directory':'nav-directory','installers':'nav-installers','expirations':'nav-expirations'};
 function setView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -2240,6 +2321,267 @@ function renderCX() {
   if(t3) t3.textContent = isEs ? 'Ranking Errores por Instalador' : 'Installer Error Ranking';
 }
 
+/* ── KNOWLEDGE BASE ── */
+const KNOWLEDGE_DOCS = [
+  {type:'SOP',typeEs:'SOP',title_en:'Field Measurement Process',title_es:'Proceso de Medición en Campo',dept:'Ventas',ver:'2.1',by:'Marco B.',date:'15 May 2026',reads:12},
+  {type:'Manual',typeEs:'Manual',title_en:'Sales Manual — Contact & Handle',title_es:'Manual de Ventas — Contacto y Handle',dept:'Ventas',ver:'3.0',by:'Marco B.',date:'10 May 2026',reads:8},
+  {type:'Script',typeEs:'Script',title_en:'7-Day Follow-Up Script',title_es:'Script de Follow-Up (7 días)',dept:'Ventas',ver:'1.4',by:'Sarah K.',date:'08 May 2026',reads:15},
+  {type:'Script',typeEs:'Script',title_en:'Price Objection Handling',title_es:'Manejo de Objeciones — Precio',dept:'Ventas',ver:'2.0',by:'Marco B.',date:'05 May 2026',reads:11},
+  {type:'SOP',typeEs:'SOP',title_en:'Pre-Installation Protocol',title_es:'Protocolo Pre-Instalación',dept:'Operaciones',ver:'1.8',by:'Greg D.',date:'01 May 2026',reads:6},
+  {type:'Policy',typeEs:'Política',title_en:'Warranty Policy — Aromaz',title_es:'Política de Garantías — Aromaz',dept:'Customer Service',ver:'1.2',by:'Marco B.',date:'28 Abr 2026',reads:9},
+  {type:'Memo',typeEs:'Memo',title_en:'New Commission Structure Q2 2026',title_es:'Memo: Nueva estructura de comisiones Q2 2026',dept:'General',ver:'1.0',by:'Marco B.',date:'20 Abr 2026',reads:18},
+  {type:'Order',typeEs:'Orden',title_en:'Standing Order: Field Uniforms',title_es:'Orden Permanente: Uso de uniformes en campo',dept:'General',ver:'1.0',by:'Marco B.',date:'01 Mar 2026',reads:22},
+  {type:'Manual',typeEs:'Manual',title_en:'LVP / Vinyl Installation Manual',title_es:'Manual de Instalación — LVP / Vinyl',dept:'Operaciones',ver:'2.3',by:'Greg D.',date:'15 Feb 2026',reads:14},
+];
+const TYPE_COLORS={'SOP':'#3B82F6','Manual':'#8B5CF6','Script':'#10B981','Policy':'#F59E0B','Memo':'#6B7280','Order':'#F97316'};
+function renderKnowledge(){
+  const isEs=LANG==='es';
+  // Type summary cards
+  const typeMap={};
+  KNOWLEDGE_DOCS.forEach(d=>{const k=d.type;typeMap[k]=(typeMap[k]||0)+1;});
+  const tg=document.getElementById('knowledge-type-cards');
+  if(tg)tg.innerHTML=Object.entries(typeMap).map(([t,n])=>`
+    <div style="background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:12px;padding:16px;cursor:pointer;transition:box-shadow .15s" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseleave="this.style.boxShadow=''">
+      <div style="width:36px;height:36px;border-radius:8px;background:${TYPE_COLORS[t]}22;display:flex;align-items:center;justify-content:center;margin-bottom:10px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${TYPE_COLORS[t]}" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${isEs?(KNOWLEDGE_DOCS.find(d=>d.type===t)||{}).typeEs||t:t}</div>
+      <div style="font-size:11px;color:var(--text-subtle);margin-top:2px">${n} ${isEs?'documentos':'docs'}</div>
+    </div>`).join('');
+  // Table
+  const tb=document.getElementById('knowledge-table');
+  if(tb)tb.innerHTML=`<thead><tr>
+    <th>${isEs?'Documento':'Document'}</th>
+    <th>${isEs?'Tipo':'Type'}</th>
+    <th>${isEs?'Departamento':'Dept'}</th>
+    <th>Ver.</th>
+    <th>${isEs?'Actualizado por':'Updated by'}</th>
+    <th>${isEs?'Fecha':'Date'}</th>
+    <th style="text-align:right">${isEs?'Lecturas':'Reads'}</th>
+  </tr></thead><tbody>${KNOWLEDGE_DOCS.map(d=>`<tr>
+    <td style="font-weight:600;color:var(--text-primary)">${isEs?d.title_es:d.title_en}</td>
+    <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${TYPE_COLORS[d.type]}22;color:${TYPE_COLORS[d.type]}">${isEs?d.typeEs:d.type}</span></td>
+    <td style="color:var(--text-secondary)">${d.dept}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-subtle)">v${d.ver}</td>
+    <td style="color:var(--text-subtle)">${d.by}</td>
+    <td style="color:var(--text-subtle);font-size:12px">${d.date}</td>
+    <td class="num" style="color:var(--text-secondary)">${d.reads}</td>
+  </tr>`).join('')}</tbody>`;
+  const t1=document.getElementById('knowledge-title');if(t1)t1.textContent=isEs?'Base de Conocimiento':'Knowledge Base';
+  const t2=document.getElementById('knowledge-sub');if(t2)t2.textContent=isEs?'SOPs · Manuales · Scripts · Políticas':'SOPs · Manuals · Scripts · Policies';
+  const t3=document.getElementById('knowledge-docs-title');if(t3)t3.textContent=isEs?'DOCUMENTOS RECIENTES':'RECENT DOCUMENTS';
+}
+
+/* ── MEETINGS ── */
+const MEETINGS_DATA = [
+  {title_en:'Board Meeting — May 2026',title_es:'Reunión Directorio — Mayo 2026',type_en:'Board',type_es:'Directorio',date:'20 May 2026',participants:['Marco B.','Sarah K.','Maria G.'],
+   topics_es:['Resultados Q1','Presupuesto Q2','Expansión Ubicación #3'],topics_en:['Q1 Results','Q2 Budget','Location #3 Expansion'],
+   tasks:[{text_es:'Análisis de costos nueva ubicación',text_en:'Cost analysis new location',who:'Anya P.',due:'30 May 2026',status:'in_progress'},
+          {text_es:'Reunión con broker inmobiliario',text_en:'Meeting with real estate broker',who:'Marco B.',due:'27 May 2026',status:'pending'},
+          {text_es:'Propuesta de expansión a inversionistas',text_en:'Expansion proposal to investors',who:'Marco B.',due:'01 Jun 2026',status:'pending'}]},
+  {title_en:'Sales Team Meeting — Week 20',title_es:'Reunión de Ventas — Semana 20',type_en:'Team',type_es:'Equipo',date:'13 May 2026',participants:['Mike T.','Sarah K.','John S.','Maria G.','Greg D.'],
+   topics_es:['Battle Plan semana 21','Follow-ups pendientes','Nuevos scripts de cierre'],topics_en:['Week 21 Battle Plan','Pending follow-ups','New closing scripts'],
+   tasks:[{text_es:'Actualizar CRM con leads de mayo',text_en:'Update CRM with May leads',who:'Sarah K.',due:'17 May 2026',status:'done'},
+          {text_es:'Role play objeciones — script nuevo',text_en:'Objection role play — new script',who:'John S.',due:'20 May 2026',status:'done'},
+          {text_es:'Llamar 8 leads sin respuesta semana 19',text_en:'Call 8 unresponsive leads from week 19',who:'Mike T.',due:'16 May 2026',status:'done'}]},
+  {title_en:'Installers Meeting — Q2',title_es:'Reunión de Instaladores — Q2',type_en:'Operations',type_es:'Operaciones',date:'06 May 2026',participants:['Greg D.','Crew A','Crew B','Crew C'],
+   topics_es:['Errores frecuentes en LVP','Protocolo de aclimatación','Seguridad en obra'],topics_en:['Common LVP errors','Acclimation protocol','Job site safety'],
+   tasks:[{text_es:'Revisar checklist pre-instalación con crews',text_en:'Review pre-install checklist with crews',who:'Greg D.',due:'13 May 2026',status:'done'},
+          {text_es:'Actualizar video protocolo de aclimatación',text_en:'Update acclimation protocol video',who:'Greg D.',due:'20 May 2026',status:'in_progress'},
+          {text_es:'Aplicar protocolo en 3 instalaciones y reportar',text_en:'Apply protocol in 3 jobs and report',who:'Crew A',due:'27 May 2026',status:'pending'}]},
+];
+const TASK_STATUS_CFG={done:{color:'var(--cond-normal)',icon:'✓'},in_progress:{color:'var(--cond-affluence)',icon:'◷'},pending:{color:'var(--cond-emergency)',icon:'○'}};
+function renderMeetings(){
+  const isEs=LANG==='es';
+  const allTasks=MEETINGS_DATA.flatMap(m=>m.tasks);
+  const pending=allTasks.filter(t=>t.status!=='done').length;
+  const kd=document.getElementById('meetings-kpis');
+  if(kd)kd.innerHTML=[
+    {l_es:'Reuniones',l_en:'Meetings',v:MEETINGS_DATA.length,s_es:'registradas',s_en:'on record'},
+    {l_es:'Tareas totales',l_en:'Total tasks',v:allTasks.length,s_es:'generadas',s_en:'generated'},
+    {l_es:'Pendientes',l_en:'Pending',v:allTasks.filter(t=>t.status==='pending').length,s_es:'sin iniciar',s_en:'not started'},
+    {l_es:'En progreso',l_en:'In progress',v:allTasks.filter(t=>t.status==='in_progress').length,s_es:'en curso',s_en:'ongoing'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${isEs?k.l_es:k.l_en}</div><div class="kpi-value" style="font-size:28px">${k.v}</div><div class="kpi-meta">${isEs?k.s_es:k.s_en}</div></div>`).join('');
+  const ml=document.getElementById('meetings-list');
+  if(ml)ml.innerHTML=MEETINGS_DATA.map(m=>`
+    <div class="data-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-subtle)">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg-secondary);color:var(--text-subtle)">${isEs?m.type_es:m.type_en}</span>
+            <span style="font-size:12px;color:var(--text-disabled)">${m.date}</span>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary)">${isEs?m.title_es:m.title_en}</div>
+          <div style="font-size:12px;color:var(--text-subtle);margin-top:4px">👥 ${m.participants.join(' · ')}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm">${isEs?'Ver acta →':'View minutes →'}</button>
+      </div>
+      <div style="padding:12px 20px;background:var(--bg-secondary);border-bottom:1px solid var(--border-subtle)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-disabled);margin-bottom:8px">${isEs?'Temas tratados':'Topics'}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${(isEs?m.topics_es:m.topics_en).map(t=>`<span style="font-size:12px;background:var(--bg-primary);border:1px solid var(--border-subtle);color:var(--text-secondary);padding:3px 10px;border-radius:20px">${t}</span>`).join('')}</div>
+      </div>
+      <div style="padding:12px 20px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-disabled);margin-bottom:10px">${isEs?`Tareas dictaminadas (${m.tasks.length})`:`Tasks (${m.tasks.length})`}</div>
+        ${m.tasks.map(t=>{const sc=TASK_STATUS_CFG[t.status];return`<div style="display:flex;align-items:center;gap:10px;padding:5px 0">
+          <span style="color:${sc.color};font-size:14px;flex-shrink:0">${sc.icon}</span>
+          <span style="flex:1;font-size:13px;color:${t.status==='done'?'var(--text-disabled)':'var(--text-secondary)'};${t.status==='done'?'text-decoration:line-through':''}">${isEs?t.text_es:t.text_en}</span>
+          <span style="font-size:12px;color:var(--text-subtle);flex-shrink:0">${t.who}</span>
+          <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-disabled);flex-shrink:0">${t.due}</span>
+        </div>`}).join('')}
+      </div>
+    </div>`).join('');
+  const t1=document.getElementById('meetings-title');if(t1)t1.textContent=isEs?'Acuerdos y Actas':'Meetings & Agreements';
+  const t2=document.getElementById('meetings-sub');if(t2)t2.textContent=isEs?`${MEETINGS_DATA.length} reuniones · ${pending} tareas activas`:`${MEETINGS_DATA.length} meetings · ${pending} active tasks`;
+  const t3=document.getElementById('meetings-list-title');if(t3)t3.textContent=isEs?'REUNIONES REGISTRADAS':'RECORDED MEETINGS';
+}
+
+/* ── DIRECTORY ── */
+const DIRECTORY_DATA = [
+  {name:'Marco Baeza',title_es:'Gerente General',title_en:'General Manager',dept:'Gerencia',email:'marco@aromazhome.com',phone:'+1 201-555-0100',loc:'Short Hills, NJ',since:'Ene 2020',initials:'MB',color:'#1E7FCC'},
+  {name:'Mike Thompson',title_es:'Vendedor Senior',title_en:'Senior Sales Rep',dept:'Ventas',email:'mike@aromazhome.com',phone:'+1 201-555-0101',loc:'Short Hills, NJ',since:'Mar 2021',initials:'MT',color:'#8B5CF6'},
+  {name:'Sarah Kim',title_es:'Vendedora',title_en:'Sales Rep',dept:'Ventas',email:'sarah@aromazhome.com',phone:'+1 732-555-0102',loc:'Edison, NJ',since:'Jun 2022',initials:'SK',color:'#EC4899'},
+  {name:'John Sandoval',title_es:'Vendedor',title_en:'Sales Rep',dept:'Ventas',email:'john@aromazhome.com',phone:'+1 973-555-0103',loc:'Newark, NJ',since:'Ago 2022',initials:'JS',color:'#10B981'},
+  {name:'Maria García',title_es:'Vendedora Senior',title_en:'Senior Sales Rep',dept:'Ventas',email:'maria@aromazhome.com',phone:'+1 201-555-0104',loc:'Union City, NJ',since:'Ene 2021',initials:'MG',color:'#F59E0B'},
+  {name:'Anya Petrov',title_es:'Finanzas y Admin',title_en:'Finance & Admin',dept:'Finanzas',email:'anya@aromazhome.com',phone:'+1 732-555-0105',loc:'Short Hills, NJ',since:'Feb 2022',initials:'AP',color:'#06B6D4'},
+  {name:'Greg Diaz',title_es:'Jefe de Operaciones',title_en:'Operations Manager',dept:'Operaciones',email:'greg@aromazhome.com',phone:'+1 973-555-0106',loc:'Newark, NJ',since:'May 2020',initials:'GD',color:'#F97316'},
+  {name:'Lisa Park',title_es:'Coordinadora Marketing',title_en:'Marketing Coordinator',dept:'Marketing',email:'lisa@aromazhome.com',phone:'+1 201-555-0107',loc:'Short Hills, NJ',since:'Sep 2023',initials:'LP',color:'#7C3AED'},
+  {name:'Carlos Rivera',title_es:'Rep. Customer Service',title_en:'Customer Service Rep',dept:'Customer Service',email:'carlos@aromazhome.com',phone:'+1 732-555-0108',loc:'Edison, NJ',since:'Nov 2022',initials:'CR',color:'#DC2626'},
+  {name:'Diana Osei',title_es:'Rep. Customer Service',title_en:'Customer Service Rep',dept:'Customer Service',email:'diana@aromazhome.com',phone:'+1 973-555-0109',loc:'Montclair, NJ',since:'Abr 2023',initials:'DO',color:'#0EA5E9'},
+];
+function renderDirectory(){
+  const isEs=LANG==='es';
+  const dg=document.getElementById('directory-grid');
+  if(!dg)return;
+  dg.innerHTML=DIRECTORY_DATA.map(p=>`
+    <div style="background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:14px;padding:20px;transition:box-shadow .15s,border-color .15s" onmouseenter="this.style.boxShadow='0 4px 20px rgba(0,0,0,.09)';this.style.borderColor='var(--border-medium)'" onmouseleave="this.style.boxShadow='';this.style.borderColor='var(--border-subtle)'">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px">
+        <div style="width:48px;height:48px;border-radius:14px;background:${p.color};display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0">${p.initials}</div>
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);line-height:1.2">${p.name}</div>
+          <div style="font-size:12px;color:var(--text-subtle);margin-top:2px">${isEs?p.title_es:p.title_en}</div>
+          <span style="display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:${p.color}18;color:${p.color}">${p.dept}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="font-size:12px;color:var(--text-subtle)">✉ ${p.email}</div>
+        <div style="font-size:12px;color:var(--text-subtle);font-family:'JetBrains Mono',monospace">☎ ${p.phone}</div>
+        <div style="font-size:12px;color:var(--text-subtle)">📍 ${p.loc}</div>
+      </div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;color:var(--text-disabled)">${isEs?'Desde':'Since'} ${p.since}</span>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px">${isEs?'Ver perfil →':'View profile →'}</button>
+      </div>
+    </div>`).join('');
+  const t1=document.getElementById('directory-title');if(t1)t1.textContent=isEs?'Directorio Interno':'Internal Directory';
+  const t2=document.getElementById('directory-sub');if(t2)t2.textContent=isEs?`${DIRECTORY_DATA.length} personas · Equipo Aromaz`:`${DIRECTORY_DATA.length} people · Aromaz Team`;
+}
+
+/* ── INSTALLERS ── */
+const INSTALLERS_DATA = [
+  {name:'Roberto Castillo',type:'in_house',crew:'Crew A',skills:['Hardwood','LVP','Laminate'],zone:'North NJ',since:'Mar 2020',jobs:84,errors:0,claims:0,condition:'power',rating:4.9,lic:'01 Ene 2027',ins:'15 Mar 2027'},
+  {name:'Miguel Ángel Reyes',type:'in_house',crew:'Crew A',skills:['Hardwood','LVP'],zone:'North NJ',since:'Jun 2021',jobs:61,errors:1,claims:0,condition:'normal',rating:4.6,lic:'15 Ago 2026',ins:'01 Abr 2027'},
+  {name:'Luis Fernando Mora',type:'in_house',crew:'Crew B',skills:['Tile','LVP','Carpet'],zone:'Central NJ',since:'Ene 2022',jobs:48,errors:2,claims:1,condition:'emergency',rating:3.8,lic:'30 Jun 2026',ins:'30 Jun 2026'},
+  {name:'Andres Vargas',type:'in_house',crew:'Crew B',skills:['Tile','Hardwood'],zone:'Central NJ',since:'Sep 2022',jobs:35,errors:1,claims:0,condition:'normal',rating:4.3,lic:'01 Mar 2027',ins:'01 Mar 2027'},
+  {name:'Precision Floors LLC',type:'sub',crew:'Sub',skills:['Hardwood','LVP','Laminate','Tile','Carpet'],zone:'All NJ',since:'Ene 2021',jobs:127,errors:0,claims:0,condition:'affluence',rating:4.8,lic:'01 Nov 2026',ins:'01 Nov 2026'},
+  {name:'J&R Flooring Sub',type:'sub',crew:'Sub',skills:['Carpet','LVP'],zone:'South NJ',since:'May 2023',jobs:22,errors:3,claims:2,condition:'danger',rating:3.1,lic:'10 May 2026',ins:'10 May 2026'},
+];
+function renderInstallers(){
+  const isEs=LANG==='es';
+  const issues=INSTALLERS_DATA.filter(i=>i.condition==='danger'||i.condition==='emergency');
+  const kd=document.getElementById('installers-kpis');
+  if(kd)kd.innerHTML=[
+    {l_es:'In-House',l_en:'In-House',v:INSTALLERS_DATA.filter(i=>i.type==='in_house').length,s_es:'empleados directos',s_en:'direct employees'},
+    {l_es:'Subcontratistas',l_en:'Subcontractors',v:INSTALLERS_DATA.filter(i=>i.type==='sub').length,s_es:'externos activos',s_en:'active externals'},
+    {l_es:'Rating promedio',l_en:'Avg rating',v:(INSTALLERS_DATA.reduce((s,i)=>s+i.rating,0)/INSTALLERS_DATA.length).toFixed(1),s_es:'★ de 5.0',s_en:'★ out of 5.0'},
+    {l_es:'Requieren atención',l_en:'Need attention',v:issues.length,s_es:'condición crítica',s_en:'critical condition',danger:issues.length>0},
+  ].map(k=>`<div class="kpi-card" ${k.danger?'style="border-color:var(--cond-danger);background:rgba(225,29,36,.05)"':''}><div class="kpi-label" ${k.danger?'style="color:var(--cond-danger)"':''}>${isEs?k.l_es:k.l_en}</div><div class="kpi-value" style="font-size:28px;${k.danger?'color:var(--cond-danger)':''}">${k.v}</div><div class="kpi-meta">${isEs?k.s_es:k.s_en}</div></div>`).join('');
+  const tb=document.getElementById('installers-table');
+  if(tb)tb.innerHTML=`<thead><tr>
+    <th>${isEs?'Instalador':'Installer'}</th>
+    <th>${isEs?'Tipo':'Type'}</th>
+    <th>Skills</th>
+    <th style="text-align:right">Rating</th>
+    <th style="text-align:right">${isEs?'Trabajos':'Jobs'}</th>
+    <th style="text-align:right">${isEs?'Errores':'Errors'}</th>
+    <th>${isEs?'Condición':'Condition'}</th>
+    <th>Docs</th>
+  </tr></thead><tbody>${INSTALLERS_DATA.map(ins=>`<tr>
+    <td style="font-weight:700;color:var(--text-primary)">${ins.name}<br><span style="font-size:11px;font-weight:400;color:var(--text-disabled)">${ins.zone}</span></td>
+    <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${ins.type==='in_house'?'#DBEAFE':'#EDE9FE'};color:${ins.type==='in_house'?'#1D4ED8':'#7C3AED'}">${ins.type==='in_house'?ins.crew:'Sub'}</span></td>
+    <td style="font-size:11px;color:var(--text-subtle)">${ins.skills.join(' · ')}</td>
+    <td class="num" style="color:var(--text-primary)">⭐ ${ins.rating}</td>
+    <td class="num" style="color:var(--text-secondary)">${ins.jobs}</td>
+    <td class="num" style="color:${ins.errors===0?'var(--text-disabled)':ins.errors>=3?'var(--cond-danger)':'var(--cond-emergency)'}">${ins.errors}</td>
+    <td>${condBadge(ins.condition)}</td>
+    <td style="font-size:11px;color:var(--text-subtle)">${isEs?'Lic':'Lic'}: ${ins.lic}</td>
+  </tr>`).join('')}</tbody>`;
+  const t1=document.getElementById('installers-title');if(t1)t1.textContent=isEs?'Gestión de Instaladores':'Installer Management';
+  const t3=document.getElementById('installers-table-title');if(t3)t3.textContent=isEs?'EQUIPO DE INSTALACIÓN':'INSTALLATION TEAM';
+}
+
+/* ── EXPIRATIONS ── */
+const EXPIRATIONS_DATA = [
+  {name_es:'Seguro — J&R Flooring Sub',name_en:'Insurance — J&R Flooring Sub',cat_es:'Docs instaladores',cat_en:'Installer docs',due:'10 May 2026',amount:0,freq_es:'Anual',freq_en:'Annual',who:'Greg D.',note_es:'Vencido — suspender trabajos',note_en:'Expired — suspend jobs'},
+  {name_es:'Registración — Truck #1 Ford Transit',name_en:'Vehicle Reg. — Truck #1 Ford Transit',cat_es:'Vehículos',cat_en:'Vehicles',due:'30 May 2026',amount:185,freq_es:'Anual',freq_en:'Annual',who:'Greg D.',note_es:'',note_en:''},
+  {name_es:'Workers Compensation Insurance',name_en:'Workers Compensation Insurance',cat_es:'Seguros',cat_en:'Insurance',due:'10 Jun 2026',amount:4200,freq_es:'Anual',freq_en:'Annual',who:'Anya P.',note_es:'Travelers Insurance',note_en:'Travelers Insurance'},
+  {name_es:'Licencia Negocio — Short Hills',name_en:'Business License — Short Hills',cat_es:'Licencias negocio',cat_en:'Business licenses',due:'01 Jul 2026',amount:350,freq_es:'Anual',freq_en:'Annual',who:'Marco B.',note_es:'Municipal — NJ',note_en:'Municipal — NJ'},
+  {name_es:'FloorZap CRM — Suscripción',name_en:'FloorZap CRM Subscription',cat_es:'Software / SaaS',cat_en:'Software / SaaS',due:'15 Jun 2026',amount:890,freq_es:'Anual',freq_en:'Annual',who:'Anya P.',note_es:'Plan Enterprise',note_en:'Enterprise plan'},
+  {name_es:'Microsoft 365 Business',name_en:'Microsoft 365 Business',cat_es:'Software / SaaS',cat_en:'Software / SaaS',due:'01 Ago 2026',amount:1200,freq_es:'Anual',freq_en:'Annual',who:'Anya P.',note_es:'10 licencias',note_en:'10 licenses'},
+  {name_es:'Acuerdo distribución Armstrong',name_en:'Armstrong Distribution Agreement',cat_es:'Contratos proveedores',cat_en:'Vendor contracts',due:'01 Sep 2026',amount:0,freq_es:'Anual',freq_en:'Annual',who:'Marco B.',note_es:'',note_en:''},
+  {name_es:'General Liability Insurance',name_en:'General Liability Insurance',cat_es:'Seguros',cat_en:'Insurance',due:'01 Oct 2026',amount:6800,freq_es:'Anual',freq_en:'Annual',who:'Anya P.',note_es:'Hartford Business Insurance',note_en:'Hartford Business Insurance'},
+  {name_es:'Local Short Hills — Arrendamiento',name_en:'Short Hills Location — Lease',cat_es:'Arrendamientos',cat_en:'Leases',due:'31 Dic 2026',amount:8500,freq_es:'Mensual',freq_en:'Monthly',who:'Marco B.',note_es:'Renovación automática',note_en:'Auto-renews'},
+];
+const TODAY_REF = new Date(2026,4,25);
+function daysLeft(dateStr){
+  const parts=dateStr.split(' ');
+  const mMap={Ene:0,Feb:1,Mar:2,Abr:3,May:4,Jun:5,Jul:6,Ago:7,Sep:8,Oct:9,Nov:10,Dic:11};
+  return Math.round((new Date(+parts[2],mMap[parts[1]]||0,+parts[0]).getTime()-TODAY_REF.getTime())/(86400000));
+}
+function expStatus(days){
+  if(days<0)return{label_es:'Vencido',label_en:'Expired',color:'var(--cond-danger)'};
+  if(days<=30)return{label_es:`${days}d`,label_en:`${days}d`,color:'var(--cond-danger)'};
+  if(days<=60)return{label_es:`${days}d`,label_en:`${days}d`,color:'var(--cond-emergency)'};
+  if(days<=90)return{label_es:`${days}d`,label_en:`${days}d`,color:'var(--cond-affluence)'};
+  return{label_es:'Vigente',label_en:'Active',color:'var(--cond-normal)'};
+}
+function renderExpirations(){
+  const isEs=LANG==='es';
+  const sorted=[...EXPIRATIONS_DATA].sort((a,b)=>daysLeft(a.due)-daysLeft(b.due));
+  const critical=EXPIRATIONS_DATA.filter(o=>daysLeft(o.due)<=30);
+  const upcoming=EXPIRATIONS_DATA.filter(o=>{const d=daysLeft(o.due);return d>30&&d<=90;});
+  const totalAnnual=EXPIRATIONS_DATA.filter(o=>o.amount>0).reduce((s,o)=>s+(o.freq_en==='Monthly'?o.amount*12:o.amount),0);
+  const kd=document.getElementById('expirations-kpis');
+  if(kd)kd.innerHTML=[
+    {l_es:'Críticos ≤30d',l_en:'Critical ≤30d',v:critical.length,s_es:'acción urgente',s_en:'urgent action',danger:critical.length>0},
+    {l_es:'Próximos ≤90d',l_en:'Upcoming ≤90d',v:upcoming.length,s_es:'ventana de atención',s_en:'attention window'},
+    {l_es:'Total registros',l_en:'Total records',v:EXPIRATIONS_DATA.length,s_es:'obligaciones',s_en:'obligations'},
+    {l_es:'Comprometido/año',l_en:'Annual committed',v:'$'+(totalAnnual/1000).toFixed(0)+'k',s_es:'costos fijos',s_en:'fixed costs'},
+  ].map(k=>`<div class="kpi-card" ${k.danger?'style="border-color:var(--cond-danger);background:rgba(225,29,36,.05)"':''}><div class="kpi-label" ${k.danger?'style="color:var(--cond-danger)"':''}>${isEs?k.l_es:k.l_en}</div><div class="kpi-value" style="font-size:28px;${k.danger?'color:var(--cond-danger)':''}">${k.v}</div><div class="kpi-meta">${isEs?k.s_es:k.s_en}</div></div>`).join('');
+  const tb=document.getElementById('expirations-table');
+  if(tb)tb.innerHTML=`<thead><tr>
+    <th>${isEs?'Obligación':'Obligation'}</th>
+    <th>${isEs?'Categoría':'Category'}</th>
+    <th>${isEs?'Vencimiento':'Due date'}</th>
+    <th>${isEs?'Estado':'Status'}</th>
+    <th style="text-align:right">${isEs?'Monto':'Amount'}</th>
+    <th>${isEs?'Frecuencia':'Frequency'}</th>
+    <th>${isEs?'Responsable':'Owner'}</th>
+  </tr></thead><tbody>${sorted.map(o=>{
+    const days=daysLeft(o.due);const st=expStatus(days);
+    return`<tr style="${days<=30?'background:rgba(225,29,36,.03)':''}">
+      <td style="font-weight:700;color:var(--text-primary)">${isEs?o.name_es:o.name_en}${(isEs?o.note_es:o.note_en)?`<br><span style="font-size:11px;font-weight:400;color:var(--text-disabled)">${isEs?o.note_es:o.note_en}</span>`:''}
+      </td>
+      <td style="font-size:12px;color:var(--text-subtle)">${isEs?o.cat_es:o.cat_en}</td>
+      <td style="font-size:12px;font-weight:600;color:var(--text-secondary)">${o.due}</td>
+      <td><span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:${st.color}18;color:${st.color}">${isEs?st.label_es:st.label_en}</span></td>
+      <td class="num" style="color:var(--text-secondary)">${o.amount>0?'$'+o.amount.toLocaleString():'—'}</td>
+      <td style="font-size:12px;color:var(--text-subtle)">${isEs?o.freq_es:o.freq_en}</td>
+      <td style="color:var(--text-subtle)">${o.who}</td>
+    </tr>`;}).join('')}</tbody>`;
+  const t1=document.getElementById('expirations-title');if(t1)t1.textContent=isEs?'Vencimientos y Obligaciones':'Expirations & Obligations';
+  const t3=document.getElementById('expirations-table-title');if(t3)t3.textContent=isEs?'OBLIGACIONES — POR FECHA DE VENCIMIENTO':'OBLIGATIONS — BY DUE DATE';
+}
+
 /* ── GM GREETING ── */
 function renderGMGreeting(){
   const gmGreet=document.getElementById('gm-greeting');
@@ -2274,6 +2616,11 @@ function renderAll(){
   renderMarketing();
   renderFinance();
   renderCX();
+  renderKnowledge();
+  renderMeetings();
+  renderDirectory();
+  renderInstallers();
+  renderExpirations();
   drawSalesChart();
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k=el.getAttribute('data-i18n');
