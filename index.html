@@ -33,6 +33,32 @@
   --sidebar-bg:#0F172A; --topbar-bg:#0F172A; --sidebar-item-active-bg:#1E293B; --sidebar-item-hover-bg:#1a2535;
   --cond-danger:#F87171; --cond-emergency:#FB923C; --cond-normal:#4ADE80; --cond-affluence:#38BDF8; --cond-power:#A78BFA;
 }
+/* ── LOGIN SCREEN ── */
+#login-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0F172A 0%,#1E293B 50%,#0F172A 100%);}
+#login-screen.hidden{display:none;}
+.login-card{width:100%;max-width:400px;padding:40px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;backdrop-filter:blur(20px);box-shadow:0 24px 64px rgba(0,0,0,0.5);}
+.login-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:32px;}
+.login-logo-circle{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1E7FCC,#0EA5E9);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 32px rgba(30,127,204,0.35);}
+.login-logo-circle svg{color:white;}
+.login-title{font-size:20px;font-weight:800;color:#F8FAFC;letter-spacing:-0.02em;}
+.login-subtitle{font-size:12px;color:#94A3B8;margin-top:4px;text-align:center;}
+.login-field{margin-bottom:16px;}
+.login-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748B;margin-bottom:6px;}
+.login-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);border-radius:10px;padding:11px 14px;font-size:14px;color:#F1F5F9;outline:none;transition:border-color .15s,background .15s;}
+.login-input::placeholder{color:#475569;}
+.login-input:focus{border-color:#1E7FCC;background:rgba(30,127,204,0.08);}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1E7FCC,#0EA5E9);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .15s,transform .1s;letter-spacing:0.01em;}
+.login-btn:hover{opacity:0.92;}
+.login-btn:active{transform:scale(0.98);}
+.login-error{display:none;background:rgba(185,28,28,0.15);border:1px solid rgba(185,28,28,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#FCA5A5;margin-bottom:14px;text-align:center;}
+.login-error.show{display:block;}
+.login-hint{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);}
+.login-hint-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:10px;text-align:center;}
+.login-hint-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+.login-hint-row+.login-hint-row{border-top:1px solid rgba(255,255,255,0.04);}
+.login-hint-role{font-size:12px;color:#94A3B8;}
+.login-hint-creds{font-size:11px;font-family:'JetBrains Mono',monospace;color:#475569;}
+.login-hint-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:14px;}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-canvas);color:var(--text-primary);min-height:100vh;overflow-x:hidden;transition:background var(--dur-normal),color var(--dur-normal);}
@@ -513,6 +539,60 @@ svg{flex-shrink:0;}
 <div class="app">
 
   <!-- SIDEBAR -->
+<!-- ════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-circle">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <div class="login-title">Aromaz Platform</div>
+      <div class="login-subtitle">Sistema de Gestión Integral</div>
+    </div>
+
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos</div>
+
+    <div class="login-field">
+      <label class="login-label" for="login-user">Usuario</label>
+      <input class="login-input" id="login-user" type="text" placeholder="usuario@aromazhome.com" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="login-pass">Contraseña</label>
+      <input class="login-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+
+    <!-- Credential hints -->
+    <div class="login-hint">
+      <div class="login-hint-title">Accesos de demostración</div>
+      <div class="login-hint-row">
+        <div>
+          <span class="login-hint-badge" style="background:rgba(30,127,204,.2);color:#60A5FA">GM</span>
+          <span class="login-hint-role" style="margin-left:8px">Marco Baeza</span>
+        </div>
+        <span class="login-hint-creds">marco · Aromaz2026</span>
+      </div>
+      <div class="login-hint-row">
+        <div>
+          <span class="login-hint-badge" style="background:rgba(124,58,237,.2);color:#A78BFA">Sales</span>
+          <span class="login-hint-role" style="margin-left:8px">Mike Thompson</span>
+        </div>
+        <span class="login-hint-creds">mike · Sales2026</span>
+      </div>
+      <div class="login-hint-row">
+        <div>
+          <span class="login-hint-badge" style="background:rgba(249,115,22,.2);color:#FB923C">Ops</span>
+          <span class="login-hint-role" style="margin-left:8px">Greg Diaz</span>
+        </div>
+        <span class="login-hint-creds">greg · Ops2026</span>
+      </div>
+    </div>
+  </div>
+</div>
+
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
@@ -594,12 +674,17 @@ svg{flex-shrink:0;}
       </div>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-card">
-        <div class="user-avatar" id="sidebar-user-avatar">MB</div>
-        <div class="user-info">
-          <div class="user-name" id="sidebar-user-name">Marco Baeza</div>
-          <div class="user-role" id="sidebar-user-role">Gerente General</div>
+      <div class="user-card" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px;overflow:hidden;min-width:0">
+          <div class="user-avatar" id="sidebar-user-avatar">MB</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-user-name">Marco Baeza</div>
+            <div class="user-role" id="sidebar-user-role">Gerente General</div>
+          </div>
         </div>
+        <button onclick="doLogout()" title="Cerrar sesión" style="flex-shrink:0;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#606068;transition:background .15s,color .15s" onmouseenter="this.style.background='rgba(255,255,255,0.1)';this.style.color='#E0E0E4'" onmouseleave="this.style.background='';this.style.color='#606068'">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
     </div>
   </aside>
@@ -1247,13 +1332,54 @@ const COND_COLORS = { danger:'var(--cond-danger)', emergency:'var(--cond-emergen
 
 /* ── I18N ── */
 /* ── CURRENT USER (simulates authenticated session) ── */
-const CURRENT_USER = {
-  name: 'Marco Baeza',
-  firstName: 'Marco',
-  initials: 'MB',
-  role: 'gm',
-  email: 'marco@aromazhome.com',
-};
+/* ── AUTH ── */
+const USERS = [
+  {user:'marco', pass:'Aromaz2026', name:'Marco Baeza',  firstName:'Marco', initials:'MB', role:'gm',   email:'marco@aromazhome.com', roleLabel_es:'Gerente General',  roleLabel_en:'General Manager'},
+  {user:'mike',  pass:'Sales2026',  name:'Mike Thompson',firstName:'Mike',  initials:'MT', role:'sales', email:'mike@aromazhome.com',  roleLabel_es:'Vendedor Senior',   roleLabel_en:'Senior Sales Rep'},
+  {user:'sarah', pass:'Sales2026',  name:'Sarah Kim',    firstName:'Sarah', initials:'SK', role:'sales', email:'sarah@aromazhome.com', roleLabel_es:'Vendedora',         roleLabel_en:'Sales Rep'},
+  {user:'john',  pass:'Sales2026',  name:'John Sandoval',firstName:'John',  initials:'JS', role:'sales', email:'john@aromazhome.com',  roleLabel_es:'Vendedor',          roleLabel_en:'Sales Rep'},
+  {user:'maria', pass:'Sales2026',  name:'Maria García', firstName:'Maria', initials:'MG', role:'sales', email:'maria@aromazhome.com', roleLabel_es:'Vendedora Senior',   roleLabel_en:'Senior Sales Rep'},
+  {user:'anya',  pass:'Ops2026',    name:'Anya Petrov',  firstName:'Anya',  initials:'AP', role:'ops',   email:'anya@aromazhome.com',  roleLabel_es:'Finanzas y Admin',  roleLabel_en:'Finance & Admin'},
+  {user:'greg',  pass:'Ops2026',    name:'Greg Diaz',    firstName:'Greg',  initials:'GD', role:'ops',   email:'greg@aromazhome.com',  roleLabel_es:'Jefe de Operaciones',roleLabel_en:'Operations Manager'},
+];
+
+let CURRENT_USER = {name:'Marco Baeza',firstName:'Marco',initials:'MB',role:'gm',email:'marco@aromazhome.com'};
+
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  const found = USERS.find(x => (x.user === u || x.email === u) && x.pass === p);
+  if(!found){err.classList.add('show');return;}
+  err.classList.remove('show');
+  CURRENT_USER = found;
+  sessionStorage.setItem('aromaz_user', found.user);
+  applyUser(found);
+  document.getElementById('login-screen').classList.add('hidden');
+  renderAll();
+  setLang(LANG);
+}
+
+function applyUser(u){
+  const nameEl=document.getElementById('sidebar-user-name');
+  const roleEl=document.getElementById('sidebar-user-role');
+  const avatarEl=document.getElementById('sidebar-user-avatar');
+  if(nameEl)nameEl.textContent=u.name;
+  if(avatarEl)avatarEl.textContent=u.initials;
+  if(roleEl)roleEl.textContent=LANG==='es'?u.roleLabel_es:u.roleLabel_en;
+  setView(u.role==='gm'?'gm-dashboard':'vendor-dashboard');
+}
+
+function doLogout(){
+  sessionStorage.removeItem('aromaz_user');
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+  document.getElementById('login-screen').classList.remove('hidden');
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin();
+});
 
 /* ── GEO LANGUAGE DETECTION ── */
 function detectLang() {
@@ -2629,22 +2755,25 @@ function renderAll(){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
-  // Apply real user name to sidebar
-  const nameEl = document.getElementById('sidebar-user-name');
-  const roleEl = document.getElementById('sidebar-user-role');
-  const avatarEl = document.getElementById('sidebar-user-avatar');
-  if(nameEl) nameEl.textContent = CURRENT_USER.name;
-  if(avatarEl) avatarEl.textContent = CURRENT_USER.initials;
-
-  // Detect language from browser locale / timezone
+  // Detect language first
   const detectedLang = detectLang();
   LANG = detectedLang;
-  if(roleEl) roleEl.textContent = detectedLang === 'es' ? 'Gerente General' : 'General Manager';
 
-  renderAll();
+  // Check for saved session
+  const savedUser = sessionStorage.getItem('aromaz_user');
+  const found = savedUser ? USERS.find(u => u.user === savedUser) : null;
+
+  if(found){
+    CURRENT_USER = found;
+    document.getElementById('login-screen').classList.add('hidden');
+    applyUser(found);
+    renderAll();
+    setLang(detectedLang);
+  }
+  // else: login screen stays visible, app won't render until doLogin() succeeds
+
   let rt;
   window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(drawSalesChart,100);});
-  setLang(detectedLang);
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 </script>
