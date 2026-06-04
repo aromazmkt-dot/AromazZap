@@ -38,10 +38,7 @@
 #login-screen.hidden{display:none;}
 .login-card{width:100%;max-width:400px;padding:40px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;backdrop-filter:blur(20px);box-shadow:0 24px 64px rgba(0,0,0,0.5);}
 .login-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:32px;}
-.login-logo-circle{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1E7FCC,#0EA5E9);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 32px rgba(30,127,204,0.35);}
-.login-logo-circle svg{color:white;}
-.login-title{font-size:20px;font-weight:800;color:#F8FAFC;letter-spacing:-0.02em;}
-.login-subtitle{font-size:12px;color:#94A3B8;margin-top:4px;text-align:center;}
+.login-subtitle{font-size:12px;color:#64748B;margin-top:4px;text-align:center;letter-spacing:0.04em;text-transform:uppercase;}
 .login-field{margin-bottom:16px;}
 .login-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748B;margin-bottom:6px;}
 .login-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);border-radius:10px;padding:11px 14px;font-size:14px;color:#F1F5F9;outline:none;transition:border-color .15s,background .15s;}
@@ -545,10 +542,8 @@ svg{flex-shrink:0;}
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
-      <div class="login-logo-circle">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </div>
-      <div class="login-title">Aromaz Platform</div>
+      <img src="Logos/aromaz-logo-2022-blanco_Mesa%20de%20trabajo%201.png" alt="Aromaz Home" style="height:56px;object-fit:contain;margin-bottom:10px" onerror="this.style.display='none';document.getElementById('login-logo-fallback').style.display='block'">
+      <div id="login-logo-fallback" style="display:none;font-size:22px;font-weight:900;color:#F8FAFC;letter-spacing:-0.02em;margin-bottom:6px">AROMAZ</div>
       <div class="login-subtitle">Sistema de Gestión Integral</div>
     </div>
 
@@ -564,32 +559,6 @@ svg{flex-shrink:0;}
     </div>
 
     <button class="login-btn" onclick="doLogin()">Ingresar</button>
-
-    <!-- Credential hints -->
-    <div class="login-hint">
-      <div class="login-hint-title">Accesos de demostración</div>
-      <div class="login-hint-row">
-        <div>
-          <span class="login-hint-badge" style="background:rgba(30,127,204,.2);color:#60A5FA">GM</span>
-          <span class="login-hint-role" style="margin-left:8px">Marco Baeza</span>
-        </div>
-        <span class="login-hint-creds">marco · Aromaz2026</span>
-      </div>
-      <div class="login-hint-row">
-        <div>
-          <span class="login-hint-badge" style="background:rgba(124,58,237,.2);color:#A78BFA">Sales</span>
-          <span class="login-hint-role" style="margin-left:8px">Mike Thompson</span>
-        </div>
-        <span class="login-hint-creds">mike · Sales2026</span>
-      </div>
-      <div class="login-hint-row">
-        <div>
-          <span class="login-hint-badge" style="background:rgba(249,115,22,.2);color:#FB923C">Ops</span>
-          <span class="login-hint-role" style="margin-left:8px">Greg Diaz</span>
-        </div>
-        <span class="login-hint-creds">greg · Ops2026</span>
-      </div>
-    </div>
   </div>
 </div>
 
