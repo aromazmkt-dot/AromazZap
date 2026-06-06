@@ -1,35 +1,59 @@
 import Topbar from '@/components/layout/Topbar'
 import { Plus, Filter, Search } from 'lucide-react'
+import { createAdminClient } from '@/lib/supabase/admin'
 
-const STAGE_COLORS: Record<string, string> = {
-  new: 'bg-zinc-100 text-zinc-600',
-  contacted: 'bg-blue-100 text-blue-700',
-  qualified: 'bg-violet-100 text-violet-700',
-  won: 'bg-emerald-100 text-emerald-700',
-  lost: 'bg-red-100 text-red-600',
-}
-const STAGE_LABELS: Record<string, string> = {
-  new: 'Nuevo', contacted: 'Contactado', qualified: 'Calificado', won: 'Ganado', lost: 'Perdido',
-}
-const PRIORITY_COLORS: Record<string, string> = {
-  high: 'text-red-600', medium: 'text-amber-600', low: 'text-zinc-400',
+const SOURCE_COLORS: Record<string, string> = {
+  'Google Search': 'bg-blue-100 text-blue-700',
+  'Flags & Banners': 'bg-orange-100 text-orange-700',
+  'Repeat': 'bg-emerald-100 text-emerald-700',
+  'Walk-in': 'bg-violet-100 text-violet-700',
+  'Website': 'bg-cyan-100 text-cyan-700',
+  'ZapAssist AI': 'bg-pink-100 text-pink-700',
+  'Referral': 'bg-amber-100 text-amber-700',
 }
 
-const MOCK_LEADS = [
-  { id: '1', name: 'Peterson Family', phone: '+1 201-555-0101', source: 'Google Ads', stage: 'qualified', priority: 'high', assignedTo: 'Mike T.', created: '20 May 2026' },
-  { id: '2', name: 'Chen Residence', phone: '+1 732-555-0188', source: 'Referido', stage: 'contacted', priority: 'high', assignedTo: 'Sarah K.', created: '19 May 2026' },
-  { id: '3', name: 'Robert Okafor', phone: '+1 973-555-0143', source: 'Instagram', stage: 'new', priority: 'medium', assignedTo: 'John S.', created: '19 May 2026' },
-  { id: '4', name: 'The García Family', phone: '+1 201-555-0199', source: 'Google Ads', stage: 'won', priority: 'medium', assignedTo: 'Maria G.', created: '17 May 2026' },
-  { id: '5', name: 'Linda Kowalski', phone: '+1 732-555-0156', source: 'Walk-in', stage: 'contacted', priority: 'low', assignedTo: 'Anya P.', created: '17 May 2026' },
-  { id: '6', name: 'Marcus Williams', phone: '+1 973-555-0177', source: 'Facebook Ads', stage: 'new', priority: 'medium', assignedTo: 'Greg D.', created: '16 May 2026' },
-]
+function sourceColor(src: string) {
+  return SOURCE_COLORS[src] ?? 'bg-zinc-100 text-zinc-600'
+}
 
-export default function LeadsPage() {
+function formatDate(d: string | null) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+export default async function LeadsPage() {
+  const supabase = createAdminClient()
+
+  const { data: leads } = await supabase
+    .from('leads')
+    .select('id, full_name, company_name, cell_phone, email, lead_source, lead_status, created_by, lead_date, created_date')
+    .order('created_date', { ascending: false })
+    .limit(200)
+
+  const rows = leads ?? []
+
+  // Aggregate by source
+  const sourceCounts: Record<string, number> = {}
+  for (const l of rows) {
+    const src = l.lead_source || 'Sin fuente'
+    sourceCounts[src] = (sourceCounts[src] ?? 0) + 1
+  }
+  const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 6)
+
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <Topbar title="Leads" subtitle={`${MOCK_LEADS.length} activos · Semana 21`} />
+      <Topbar title="Leads" subtitle={`${rows.length} registros · Datos reales`} />
 
       <main className="flex-1 overflow-y-auto p-6">
+        {/* Source pills */}
+        <div className="flex gap-2 flex-wrap mb-5">
+          {topSources.map(([src, count]) => (
+            <span key={src} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${sourceColor(src)}`}>
+              {src} <span className="font-mono">{count}</span>
+            </span>
+          ))}
+        </div>
+
         {/* Toolbar */}
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-500">
@@ -44,16 +68,6 @@ export default function LeadsPage() {
           </a>
         </div>
 
-        {/* Stage summary pills */}
-        <div className="flex gap-2 flex-wrap mb-5">
-          {Object.entries(STAGE_LABELS).map(([stage, label]) => (
-            <span key={stage} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border border-transparent ${STAGE_COLORS[stage]}`}>
-              {label}
-              <span className="font-mono">{MOCK_LEADS.filter(l => l.stage === stage).length}</span>
-            </span>
-          ))}
-        </div>
-
         {/* Table */}
         <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
@@ -62,31 +76,32 @@ export default function LeadsPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Nombre</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Teléfono</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Fuente</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Etapa</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Prioridad</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Asignado</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Creado</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Estado</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Creado por</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Fecha</th>
                 <th />
               </tr>
             </thead>
             <tbody>
-              {MOCK_LEADS.map((lead) => (
+              {rows.map((lead) => (
                 <tr key={lead.id} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
-                  <td className="px-4 py-3 font-semibold text-zinc-900">{lead.name}</td>
-                  <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{lead.phone}</td>
-                  <td className="px-4 py-3 text-zinc-600">{lead.source}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${STAGE_COLORS[lead.stage]}`}>
-                      {STAGE_LABELS[lead.stage]}
+                    <div className="font-semibold text-zinc-900">{lead.full_name || lead.company_name || '—'}</div>
+                    {lead.email && <div className="text-xs text-zinc-400 mt-0.5">{lead.email}</div>}
+                  </td>
+                  <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{lead.cell_phone || '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${sourceColor(lead.lead_source || '')}`}>
+                      {lead.lead_source || 'N/A'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-semibold uppercase tracking-wide ${PRIORITY_COLORS[lead.priority]}`}>
-                      {lead.priority === 'high' ? 'Alta' : lead.priority === 'medium' ? 'Media' : 'Baja'}
+                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-700">
+                      {lead.lead_status || 'Qualified'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-zinc-600">{lead.assignedTo}</td>
-                  <td className="px-4 py-3 text-zinc-400 text-xs">{lead.created}</td>
+                  <td className="px-4 py-3 text-zinc-600 text-xs">{lead.created_by || '—'}</td>
+                  <td className="px-4 py-3 text-zinc-400 text-xs">{formatDate(lead.lead_date || lead.created_date)}</td>
                   <td className="px-4 py-3">
                     <a href={`/leads/${lead.id}`} className="text-xs text-blue-600 hover:underline font-medium">Ver →</a>
                   </td>
