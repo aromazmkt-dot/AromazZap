@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Topbar from '@/components/layout/Topbar'
 import ProductEditForm from './ProductEditForm'
@@ -60,9 +61,9 @@ export default async function ProductDetailPage({
       />
 
       {/* Back */}
-      <a href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--muted)', fontWeight: 500, textDecoration: 'none', marginBottom: 16 }}>
+      <Link href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--muted)', fontWeight: 500, textDecoration: 'none', marginBottom: 16 }}>
         <ArrowLeft size={14} /> Volver a Productos
-      </a>
+      </Link>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 16, alignItems: 'start' }}>
 

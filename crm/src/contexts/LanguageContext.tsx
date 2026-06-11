@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import { t as translate, type Lang, type DictKey } from '@/lib/i18n'
 
 type LangCtx = {
@@ -16,13 +16,12 @@ const Ctx = createContext<LangCtx>({
 })
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('es')
-
-  useEffect(() => {
+  const [lang, setLangState] = useState<Lang>(() => {
+    if (typeof document === 'undefined') return 'es'
     const cookie = document.cookie.split('; ').find(r => r.startsWith('aromaz-lang='))
-    const val = cookie?.split('=')?.[1] as Lang | undefined
-    if (val === 'es' || val === 'en') setLangState(val)
-  }, [])
+    const val = cookie?.split('=')?.[1]
+    return val === 'es' || val === 'en' ? val : 'es'
+  })
 
   function setLang(l: Lang) {
     setLangState(l)

@@ -187,7 +187,7 @@ export default function LeadsClient({ leads }: { leads: Lead[] }) {
               {rows.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ padding: '60px 24px', textAlign: 'center', color: 'var(--muted)' }}>
-                    Sin resultados para "{q}"
+                    Sin resultados para &quot;{q}&quot;
                   </td>
                 </tr>
               ) : rows.map((lead, i) => (

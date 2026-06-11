@@ -1,5 +1,5 @@
 import Topbar from '@/components/layout/Topbar'
-import { User, Bell, Shield, Database, Globe, Palette } from 'lucide-react'
+import { User, Bell, Shield, Database, Palette } from 'lucide-react'
 
 function SettingsSection({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (

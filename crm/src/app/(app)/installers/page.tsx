@@ -1,8 +1,6 @@
 import Topbar from '@/components/layout/Topbar'
 import { Plus, Search, Star, AlertTriangle, CheckCircle, HardHat } from 'lucide-react'
 
-const SKILLS = ['Hardwood', 'LVP', 'Tile', 'Laminate', 'Carpet']
-
 const CONDITION_META: Record<string, { label: string; color: string; bg: string }> = {
   power: { label: 'PODER', color: 'text-emerald-700', bg: 'bg-emerald-100' },
   affluence: { label: 'AFLUENCIA', color: 'text-blue-700', bg: 'bg-blue-100' },

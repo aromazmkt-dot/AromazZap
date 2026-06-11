@@ -187,6 +187,28 @@ function ObligationForm({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 type SortKey = 'due_date' | 'name' | 'amount' | 'responsible'
+type Translate = (key: DictKey, vars?: Record<string, string | number>) => string
+
+function StatusBadge({ days, t }: { days: number; t: Translate }) {
+  const status = obligationStatus(days)
+  const cfg = {
+    overdue:  { bg: 'var(--red-50)',   color: 'var(--red-700)',   text: t('exp.status.overdue') },
+    critical: { bg: 'var(--red-50)',   color: 'var(--red-700)',   text: `${days}d` },
+    upcoming: { bg: 'var(--amber-50)', color: 'var(--amber-700)', text: `${days}d` },
+    ok:       { bg: 'var(--green-50)', color: 'var(--green-700)', text: t('exp.status.vigente') },
+  }[status]
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+      <span style={{ width: 5, height: 5, borderRadius: 99, background: 'currentColor', flexShrink: 0 }} />
+      {cfg.text}
+    </span>
+  )
+}
+
+function SortIcon({ col, sortKey, sortAsc }: { col: SortKey; sortKey: SortKey; sortAsc: boolean }) {
+  if (sortKey !== col) return <span style={{ opacity: .3, fontSize: 9, marginLeft: 3 }}>↕</span>
+  return sortAsc ? <ChevronUp size={11} style={{ marginLeft: 3, display: 'inline' }} /> : <ChevronDown size={11} style={{ marginLeft: 3, display: 'inline' }} />
+}
 
 export default function ExpirationsClient({ obligations: initial }: { obligations: Obligation[] }) {
   const { t, lang } = useLang()
@@ -194,22 +216,6 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
   const MONTHS = ['month.01','month.02','month.03','month.04','month.05','month.06',
                   'month.07','month.08','month.09','month.10','month.11','month.12']
     .map(k => t(k as Parameters<typeof t>[0]))
-
-  function StatusBadge({ days }: { days: number }) {
-    const status = obligationStatus(days)
-    const cfg = {
-      overdue:  { bg: 'var(--red-50)',   color: 'var(--red-700)',   text: t('exp.status.overdue') },
-      critical: { bg: 'var(--red-50)',   color: 'var(--red-700)',   text: `${days}d` },
-      upcoming: { bg: 'var(--amber-50)', color: 'var(--amber-700)', text: `${days}d` },
-      ok:       { bg: 'var(--green-50)', color: 'var(--green-700)', text: t('exp.status.vigente') },
-    }[status]
-    return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-        <span style={{ width: 5, height: 5, borderRadius: 99, background: 'currentColor', flexShrink: 0 }} />
-        {cfg.text}
-      </span>
-    )
-  }
 
   const [obligations, setObligations] = useState<Obligation[]>(initial)
   const [q, setQ] = useState('')
@@ -347,11 +353,6 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
     padding: '28px 32px', width: '100%', maxHeight: '90vh', overflowY: 'auto',
   }
 
-  function SortIcon({ col }: { col: SortKey }) {
-    if (sortKey !== col) return <span style={{ opacity: .3, fontSize: 9, marginLeft: 3 }}>↕</span>
-    return sortAsc ? <ChevronUp size={11} style={{ marginLeft: 3, display: 'inline' }} /> : <ChevronDown size={11} style={{ marginLeft: 3, display: 'inline' }} />
-  }
-
   const resultCount = sorted.length === 1 ? t('common.results_one') : t('common.results_other', { n: n(sorted.length) })
 
   return (
@@ -441,13 +442,13 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
-                <th style={thStyle} onClick={() => toggleSort('name')}>{t('exp.col.obligation')} <SortIcon col="name" /></th>
+                <th style={thStyle} onClick={() => toggleSort('name')}>{t('exp.col.obligation')} <SortIcon col="name" sortKey={sortKey} sortAsc={sortAsc} /></th>
                 <th style={thStyle}>{t('exp.col.category')}</th>
-                <th style={thStyle} onClick={() => toggleSort('due_date')}>{t('exp.col.duedate')} <SortIcon col="due_date" /></th>
+                <th style={thStyle} onClick={() => toggleSort('due_date')}>{t('exp.col.duedate')} <SortIcon col="due_date" sortKey={sortKey} sortAsc={sortAsc} /></th>
                 <th style={thStyle}>{t('exp.col.status')}</th>
-                <th style={{ ...thStyle, textAlign: 'right' }} onClick={() => toggleSort('amount')}>{t('exp.col.amount')} <SortIcon col="amount" /></th>
+                <th style={{ ...thStyle, textAlign: 'right' }} onClick={() => toggleSort('amount')}>{t('exp.col.amount')} <SortIcon col="amount" sortKey={sortKey} sortAsc={sortAsc} /></th>
                 <th style={thStyle}>{t('exp.col.frequency')}</th>
-                <th style={thStyle} onClick={() => toggleSort('responsible')}>{t('exp.col.responsible')} <SortIcon col="responsible" /></th>
+                <th style={thStyle} onClick={() => toggleSort('responsible')}>{t('exp.col.responsible')} <SortIcon col="responsible" sortKey={sortKey} sortAsc={sortAsc} /></th>
                 <th style={{ ...thStyle, width: 100, cursor: 'default' }} />
               </tr>
             </thead>
@@ -476,7 +477,7 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
                     <td style={{ padding: '12px 16px', fontSize: 12.5, fontWeight: 600, color: isOver ? 'var(--red-700)' : 'var(--ink-2)', whiteSpace: 'nowrap' }}>
                       {fmtOblDate(ob.due_date, MONTHS)}
                     </td>
-                    <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}><StatusBadge days={ob.days} /></td>
+                    <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}><StatusBadge days={ob.days} t={t} /></td>
                     <td style={{ padding: '12px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>
                       {ob.amount > 0 ? `$${n(ob.amount)}` : <span style={{ color: 'var(--faint)' }}>—</span>}
                     </td>
@@ -510,7 +511,7 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              <StatusBadge days={detailOb.days} />
+              <StatusBadge days={detailOb.days} t={t} />
               {CAT_MAP[detailOb.category as CatKey] && (
                 <span style={{ display: 'inline-flex', padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 600, background: CAT_MAP[detailOb.category as CatKey].bg, color: CAT_MAP[detailOb.category as CatKey].color }}>
                   {t(`cat.${detailOb.category}` as Parameters<typeof t>[0])}

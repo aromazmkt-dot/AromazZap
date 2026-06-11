@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { updateProduct } from './actions'
+import Link from 'next/link'
 import { Check, Pencil } from 'lucide-react'
+import { updateProduct } from './actions'
 
 type Product = {
   product_name: string | null
@@ -149,7 +150,7 @@ export default function ProductEditForm({
         >
           {saved ? <><Check size={15} /> Guardado</> : isPending ? 'Guardando…' : <><Pencil size={14} /> Guardar cambios</>}
         </button>
-        <a href="/products" style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500, textDecoration: 'none' }}>Cancelar</a>
+        <Link href="/products" style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500, textDecoration: 'none' }}>Cancelar</Link>
       </div>
     </form>
   )
