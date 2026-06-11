@@ -1,157 +1,266 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { cn, initials } from '@/lib/utils'
 import {
   LayoutDashboard, Users, UserCheck, FileText, Receipt,
   Package, Settings, ChevronLeft, Menu, LogOut,
   BookOpen, ClipboardList, UsersRound, HardHat, CalendarClock,
+  TrendingUp,
 } from 'lucide-react'
-
-const NAV_SECTIONS = [
-  {
-    label: 'Ventas',
-    items: [
-      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/leads', label: 'Leads', icon: Users },
-      { href: '/customers', label: 'Clientes', icon: UserCheck },
-      { href: '/quotes', label: 'Cotizaciones', icon: FileText },
-      { href: '/invoices', label: 'Facturas', icon: Receipt },
-      { href: '/products', label: 'Productos', icon: Package },
-    ],
-  },
-  {
-    label: 'Organización',
-    items: [
-      { href: '/knowledge', label: 'Conocimiento', icon: BookOpen },
-      { href: '/meetings', label: 'Acuerdos y Actas', icon: ClipboardList },
-      { href: '/directory', label: 'Directorio', icon: UsersRound },
-    ],
-  },
-  {
-    label: 'Operaciones',
-    items: [
-      { href: '/installers', label: 'Instaladores', icon: HardHat },
-      { href: '/expirations', label: 'Vencimientos', icon: CalendarClock },
-    ],
-  },
-]
+import { useLang } from '@/contexts/LanguageContext'
 
 interface SidebarProps {
   user: { name: string; email: string; role: string }
+  onSignOut: () => Promise<void>
 }
 
-export default function Sidebar({ user }: SidebarProps) {
+function initials(name: string) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+}
+
+export default function Sidebar({ user, onSignOut }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const { t } = useLang()
+
+  const NAV_SECTIONS = [
+    {
+      key: 'nav.section.operation',
+      items: [
+        { href: '/dashboard',  labelKey: 'nav.dashboard',   icon: TrendingUp },
+        { href: '/leads',      labelKey: 'nav.leads',       icon: Users },
+        { href: '/customers',  labelKey: 'nav.customers',   icon: UserCheck },
+        { href: '/quotes',     labelKey: 'nav.quotes',      icon: FileText },
+        { href: '/invoices',   labelKey: 'nav.invoices',    icon: Receipt },
+        { href: '/products',   labelKey: 'nav.products',    icon: Package },
+      ],
+    },
+    {
+      key: 'nav.section.organization',
+      items: [
+        { href: '/knowledge',  labelKey: 'nav.knowledge',   icon: BookOpen },
+        { href: '/meetings',   labelKey: 'nav.meetings',    icon: ClipboardList },
+        { href: '/directory',  labelKey: 'nav.directory',   icon: UsersRound },
+      ],
+    },
+    {
+      key: 'nav.section.fieldops',
+      items: [
+        { href: '/installers',  labelKey: 'nav.installers',  icon: HardHat },
+        { href: '/expirations', labelKey: 'nav.expirations', icon: CalendarClock },
+      ],
+    },
+  ] as const
 
   const isActive = (href: string) =>
     pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
 
   return (
     <aside
-      className={cn(
-        'fixed top-2.5 left-2.5 bottom-2.5 z-40 flex flex-col rounded-2xl transition-all duration-200',
-        'bg-zinc-900/95 backdrop-blur-xl border border-white/[0.08]',
-        'shadow-[0_8px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.07)]',
-        collapsed ? 'w-16' : 'w-60'
-      )}
+      style={{
+        width: collapsed ? 70 : 252,
+        background: 'linear-gradient(185deg, var(--sb-1), var(--sb-2))',
+        color: 'var(--sb-text)',
+        position: 'fixed',
+        top: 10,
+        left: 10,
+        bottom: 10,
+        height: 'auto',
+        borderRadius: 20,
+        overflowY: 'auto',
+        zIndex: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'width .22s cubic-bezier(.4,0,.2,1)',
+        boxShadow: '0 8px 40px rgba(12,36,64,.35)',
+      }}
     >
-      {/* Header */}
-      <div className="flex items-center h-[60px] px-4 border-b border-white/[0.06] flex-shrink-0 gap-3">
-        {!collapsed && (
-          <div className="flex-1 min-w-0">
-            <span className="text-white font-bold text-sm tracking-tight">Aromaz</span>
-            <span className="text-zinc-500 text-sm"> CRM</span>
-          </div>
-        )}
-        {collapsed && (
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-bold mx-auto">A</div>
+      {/* Glow overlay */}
+      <div style={{
+        position: 'absolute', inset: '0 0 auto 0', height: 200,
+        background: 'radial-gradient(120% 80% at 20% 0%, rgba(30,127,204,.22), transparent 60%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Brand */}
+      <div style={{
+        padding: '16px 12px 14px',
+        borderBottom: '1px solid rgba(255,255,255,.06)',
+        marginBottom: 4,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        minHeight: 64,
+      }}>
+        {!collapsed ? (
+          <Image
+            src="/logo-aromaz-blanco.png"
+            alt="Aromaz Home"
+            width={120}
+            height={36}
+            style={{ objectFit: 'contain', width: 'auto', height: 36 }}
+            priority
+          />
+        ) : (
+          <Image
+            src="/isotipo-aromaz.png"
+            alt="Aromaz"
+            width={34}
+            height={34}
+            style={{ objectFit: 'contain' }}
+            priority
+          />
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={cn(
-            'w-7 h-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors flex-shrink-0',
-            collapsed && 'mx-auto'
-          )}
+          style={{
+            position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+            width: 26, height: 26, borderRadius: 8,
+            border: '1px solid rgba(255,255,255,.10)',
+            background: 'rgba(255,255,255,.05)',
+            color: 'rgba(255,255,255,.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', transition: 'background .15s',
+          }}
         >
-          {collapsed ? <Menu size={16} /> : <ChevronLeft size={16} />}
+          {collapsed ? <Menu size={13} /> : <ChevronLeft size={13} />}
         </button>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-1">
+      <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 10px', display: 'flex', flexDirection: 'column', gap: 1 }}>
         {NAV_SECTIONS.map((section) => (
-          <div key={section.label}>
+          <div key={section.key}>
             {!collapsed && (
-              <div className="px-5 pt-3 pb-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                  {section.label}
-                </span>
+              <div style={{
+                padding: '10px 12px 4px',
+                fontSize: 9.5,
+                fontWeight: 700,
+                letterSpacing: 1,
+                color: 'var(--sb-muted)',
+                textTransform: 'uppercase',
+              }}>
+                {t(section.key)}
               </div>
             )}
-            {collapsed && <div className="border-t border-white/[0.05] mx-3 my-2" />}
-            {section.items.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                title={collapsed ? label : undefined}
-                className={cn(
-                  'flex items-center gap-2.5 px-3 py-2 mx-2 my-0.5 rounded-xl text-sm font-medium transition-all duration-150 overflow-hidden whitespace-nowrap',
-                  'border border-transparent',
-                  isActive(href)
-                    ? 'bg-blue-600/20 text-blue-200 border-blue-500/30 shadow-[0_2px_12px_rgba(37,99,235,0.2)]'
-                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.07] hover:border-white/[0.06]'
-                )}
-              >
-                <Icon size={17} className="flex-shrink-0" />
-                {!collapsed && <span className="flex-1">{label}</span>}
-              </Link>
-            ))}
+            {collapsed && <div style={{ height: 1, background: 'rgba(255,255,255,.06)', margin: '8px 6px' }} />}
+            {section.items.map(({ href, labelKey, icon: Icon }) => {
+              const active = isActive(href)
+              const label = t(labelKey)
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  title={collapsed ? label : undefined}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 11,
+                    padding: collapsed ? '11px' : '10px 12px',
+                    justifyContent: collapsed ? 'center' : undefined,
+                    color: active ? '#fff' : 'var(--sb-text)',
+                    fontWeight: active ? 600 : 500,
+                    fontSize: 13,
+                    borderRadius: 10,
+                    position: 'relative',
+                    transition: 'background .15s, color .15s',
+                    background: active ? 'linear-gradient(90deg, rgba(30,127,204,.32), rgba(30,127,204,.12))' : 'transparent',
+                    textDecoration: 'none',
+                    whiteSpace: 'nowrap',
+                    marginBottom: 1,
+                  }}
+                >
+                  {active && (
+                    <span style={{
+                      position: 'absolute', left: -10, top: 8, bottom: 8,
+                      width: 3, borderRadius: '0 3px 3px 0',
+                      background: 'var(--brand)',
+                      boxShadow: '0 0 12px rgba(30,127,204,.8)',
+                    }} />
+                  )}
+                  <Icon size={17} style={{ flexShrink: 0, opacity: active ? 1 : 0.8, color: active ? '#7FB8EC' : undefined }} />
+                  {!collapsed && <span style={{ flex: 1 }}>{label}</span>}
+                </Link>
+              )
+            })}
           </div>
         ))}
 
-        {/* Settings at bottom */}
-        {!collapsed && <div className="px-5 pt-3 pb-1"><span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Sistema</span></div>}
-        {collapsed && <div className="border-t border-white/[0.05] mx-3 my-2" />}
+        {/* Settings */}
+        {!collapsed && (
+          <div style={{ padding: '10px 12px 4px', fontSize: 9.5, fontWeight: 700, letterSpacing: 1, color: 'var(--sb-muted)', textTransform: 'uppercase' }}>
+            {t('nav.section.system')}
+          </div>
+        )}
+        {collapsed && <div style={{ height: 1, background: 'rgba(255,255,255,.06)', margin: '8px 6px' }} />}
         <Link
           href="/settings"
-          title={collapsed ? 'Configuración' : undefined}
-          className={cn(
-            'flex items-center gap-2.5 px-3 py-2 mx-2 my-0.5 rounded-xl text-sm font-medium transition-all duration-150 border border-transparent',
-            isActive('/settings')
-              ? 'bg-blue-600/20 text-blue-200 border-blue-500/30 shadow-[0_2px_12px_rgba(37,99,235,0.2)]'
-              : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.07] hover:border-white/[0.06]'
-          )}
+          title={collapsed ? t('nav.settings') : undefined}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 11,
+            padding: collapsed ? '11px' : '10px 12px',
+            justifyContent: collapsed ? 'center' : undefined,
+            color: isActive('/settings') ? '#fff' : 'var(--sb-text)',
+            fontWeight: isActive('/settings') ? 600 : 500,
+            fontSize: 13, borderRadius: 10,
+            background: isActive('/settings') ? 'linear-gradient(90deg, rgba(30,127,204,.32), rgba(30,127,204,.12))' : 'transparent',
+            textDecoration: 'none', whiteSpace: 'nowrap',
+          }}
         >
-          <Settings size={17} className="flex-shrink-0" />
-          {!collapsed && <span className="flex-1">Configuración</span>}
+          <Settings size={17} style={{ flexShrink: 0, opacity: 0.8 }} />
+          {!collapsed && <span style={{ flex: 1 }}>{t('nav.settings')}</span>}
         </Link>
       </nav>
 
-      {/* Footer / User */}
-      <div className="flex-shrink-0 p-2 border-t border-white/[0.06]">
-        <div className={cn(
-          'flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-white/[0.06] transition-colors cursor-pointer overflow-hidden',
-          collapsed && 'justify-center'
-        )}>
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {initials(user.name)}
-          </div>
-          {!collapsed && (
-            <>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-zinc-100 truncate">{user.name}</p>
-                <p className="text-xs text-zinc-500 truncate capitalize">{user.role}</p>
-              </div>
-              <button className="text-zinc-500 hover:text-zinc-300 transition-colors">
-                <LogOut size={14} />
-              </button>
-            </>
-          )}
+      {/* Logout */}
+      <form action={onSignOut} style={{ padding: '6px 10px' }}>
+        <button
+          type="submit"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: collapsed ? '10px' : '10px 12px',
+            justifyContent: collapsed ? 'center' : undefined,
+            color: 'var(--sb-muted)', cursor: 'pointer',
+            fontWeight: 500, fontSize: 13, borderRadius: 10,
+            transition: 'background .15s, color .15s',
+            width: '100%', border: 'none', background: 'none',
+            fontFamily: 'inherit',
+          }}
+        >
+          <LogOut size={15} style={{ flexShrink: 0, opacity: 0.7 }} />
+          {!collapsed && <span>{t('nav.logout')}</span>}
+        </button>
+      </form>
+
+      {/* Footer user */}
+      <div style={{
+        padding: collapsed ? '12px 0' : '14px 18px',
+        borderTop: '1px solid rgba(255,255,255,.07)',
+        fontSize: 11, color: 'var(--sb-muted)',
+        display: 'flex', alignItems: 'center',
+        gap: collapsed ? 0 : 10,
+        justifyContent: collapsed ? 'center' : undefined,
+      }}>
+        <div style={{
+          width: 30, height: 30, borderRadius: 99,
+          background: 'linear-gradient(150deg, var(--brand), var(--brand-900))',
+          color: '#fff', display: 'grid', placeItems: 'center',
+          fontWeight: 700, fontSize: 11, flexShrink: 0,
+        }}>
+          {initials(user.name)}
         </div>
+        {!collapsed && (
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 600, color: 'var(--sb-text)', fontSize: 12.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user.name}
+            </div>
+            <div style={{ textTransform: 'capitalize', fontSize: 11 }}>{user.role}</div>
+          </div>
+        )}
       </div>
     </aside>
   )

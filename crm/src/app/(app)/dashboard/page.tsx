@@ -1,180 +1,185 @@
-import Topbar from '@/components/layout/Topbar'
-import { TrendingUp, Users, FileText, Receipt, AlertCircle, CheckCircle } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { n, money, fmtDate } from '@/lib/fmt'
+import Topbar from '@/components/layout/Topbar'
+import DashboardCharts from './DashboardCharts'
+import { TrendingUp, Users, FileText, Receipt, AlertCircle, CheckCircle } from 'lucide-react'
+import { getServerLang } from '@/lib/get-server-lang'
+import { t } from '@/lib/i18n'
 
-function KpiCard({ label, value, sub, icon: Icon, color, danger }: {
-  label: string; value: string; sub: string; icon: React.ElementType
-  color: string; danger?: boolean
-}) {
-  return (
-    <div className={`border rounded-xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow ${danger ? 'bg-red-50 border-red-200' : 'bg-white border-zinc-200'}`}>
-      <div className="flex items-center justify-between">
-        <span className={`text-xs font-semibold uppercase tracking-wider ${danger ? 'text-red-500' : 'text-zinc-500'}`}>{label}</span>
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
-          <Icon size={16} className="text-white" />
-        </div>
-      </div>
-      <div>
-        <div className={`text-2xl font-bold font-mono ${danger ? 'text-red-700' : 'text-zinc-900'}`}>{value}</div>
-        <div className="text-xs text-zinc-500 mt-1">{sub}</div>
-      </div>
-    </div>
-  )
-}
-
-function PipelineRow({ label, count, color }: { label: string; count: number; color: string }) {
-  return (
-    <div className="flex items-center justify-between py-2.5 border-b border-zinc-100 last:border-0">
-      <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${color}`} />
-        <span className="text-sm text-zinc-700">{label}</span>
-      </div>
-      <span className="text-sm font-semibold font-mono text-zinc-900">{count}</span>
-    </div>
-  )
-}
+export const revalidate = 120
 
 export default async function DashboardPage() {
   const supabase = createAdminClient()
+  const lang = await getServerLang()
 
   const [
-    { data: invoiceStats },
-    { data: leadsData },
-    { data: paymentsData },
+    { data: statsRows },
+    { data: monthlyRows },
+    { data: sourcesRows },
+    { count: leadsTotal },
     { data: recentInvoices },
   ] = await Promise.all([
-    supabase.from('invoices').select('total_sale, balance, paid_status, invoice_status'),
-    supabase.from('leads').select('id, lead_source, lead_status, created_date').order('created_date', { ascending: false }).limit(529),
-    supabase.from('payments').select('amount, payment_date').order('payment_date', { ascending: false }).limit(50),
-    supabase.from('invoices').select('invoice_number, customer_name, total_sale, balance, paid_status, salesman, invoice_date').order('invoice_date', { ascending: false }).limit(5),
+    supabase.rpc('invoice_stats'),
+    supabase.rpc('monthly_revenue', { months_back: 24 }),
+    supabase.rpc('leads_by_source'),
+    supabase.from('leads').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('invoices')
+      .select('invoice_number, customer_name, total_sale, balance, paid_status, salesman, invoice_date')
+      .order('invoice_date', { ascending: false, nullsFirst: false })
+      .limit(6),
   ])
 
-  const invoices = invoiceStats ?? []
-  const leads = leadsData ?? []
-  const payments = paymentsData ?? []
+  const stats = statsRows?.[0] ?? {
+    total_count: 0, total_revenue: 0, total_balance: 0,
+    paid_count: 0, partial_count: 0, partial_balance: 0,
+  }
 
-  const totalRevenue = invoices.reduce((s, i) => s + Number(i.total_sale || 0), 0)
-  const totalBalance = invoices.reduce((s, i) => s + Math.max(0, Number(i.balance || 0)), 0)
-  const partialCount = invoices.filter(i => i.paid_status === 'Partially Paid').length
-  const paidCount = invoices.filter(i => ['Fully Paid', 'Completed'].includes(i.paid_status ?? '')).length
-  const recentPayments = payments.slice(0, 10).reduce((s, p) => s + Number(p.amount || 0), 0)
+  const totalRevenue = Number(stats.total_revenue)
+  const totalBalance = Number(stats.total_balance)
+  const paidCount = Number(stats.paid_count)
+  const partialCount = Number(stats.partial_count)
+  const totalCount = Number(stats.total_count)
+  const totalLeads = leadsTotal ?? 0
 
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tardes' : 'Buenas noches'
+  const greeting = hour < 12 ? t(lang, 'dash.greeting.am') : hour < 18 ? t(lang, 'dash.greeting.pm') : t(lang, 'dash.greeting.night')
+
+  const monthlyData = (monthlyRows ?? []).map((r: Record<string, unknown>) => ({
+    month: r.month as string,
+    revenue: Number(r.revenue),
+    invoices: Number(r.invoice_count),
+    paid: Number(r.paid_count),
+  }))
+
+  const sourcesData = (sourcesRows ?? []).map((r: Record<string, unknown>) => ({
+    source: r.source as string,
+    count: Number(r.cnt),
+  }))
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
-      <Topbar title="Dashboard" subtitle="Datos reales · Aromaz Home" />
+    <>
+      <Topbar title={t(lang, 'dash.title')} subtitle={t(lang, 'dash.subtitle')} />
 
-      <main className="flex-1 overflow-y-auto p-6">
-        {/* Greeting */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-zinc-900">{greeting}, Marco.</h2>
-          <p className="text-sm text-zinc-500 mt-1">Resumen operativo de Aromaz Home.</p>
-        </div>
+      <div style={{ marginBottom: 22 }}>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>{greeting}, Marco.</h2>
+        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 3 }}>{t(lang, 'dash.summary')}</p>
+      </div>
 
-        {/* KPI grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <KpiCard
-            label="Revenue Total"
-            value={`$${(totalRevenue / 1000).toFixed(0)}k`}
-            sub={`${invoices.length} facturas históricas`}
-            icon={TrendingUp}
-            color="bg-blue-600"
-          />
-          <KpiCard
-            label="Leads en CRM"
-            value={String(leads.length)}
-            sub="registros importados"
-            icon={Users}
-            color="bg-violet-600"
-          />
-          <KpiCard
-            label="Facturas Pagadas"
-            value={String(paidCount)}
-            sub={`de ${invoices.length} totales`}
-            icon={FileText}
-            color="bg-emerald-600"
-          />
-          <KpiCard
-            label="Saldo Pendiente"
-            value={`$${(totalBalance / 1000).toFixed(0)}k`}
-            sub={`${partialCount} facturas parciales`}
-            icon={Receipt}
-            color="bg-red-500"
-            danger={totalBalance > 50000}
-          />
-        </div>
-
-        {/* Second row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-
-          {/* Lead sources */}
-          <div className="bg-white border border-zinc-200 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-zinc-900">Fuentes de Leads</h3>
-              <a href="/leads" className="text-xs text-blue-600 hover:underline">Ver todos →</a>
+      {/* KPI cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 14, marginBottom: 20 }}>
+        <a href="/invoices" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'linear-gradient(140deg,#2A8BD8,var(--brand-700) 75%)', borderRadius: 'var(--radius)', padding: '17px 18px', boxShadow: 'var(--shadow)', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
+            <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 99, background: 'radial-gradient(closest-side,rgba(255,255,255,.16),transparent)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ color: 'rgba(255,255,255,.82)', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.5px' }}>{t(lang, 'dash.kpi.revenue')}</span>
+              <div style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,.18)', display: 'grid', placeItems: 'center' }}><TrendingUp size={16} color="#fff" /></div>
             </div>
-            {(() => {
-              const counts: Record<string, number> = {}
-              for (const l of leads) {
-                const k = l.lead_source || 'Sin fuente'
-                counts[k] = (counts[k] ?? 0) + 1
-              }
-              const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6)
-              const colors = ['bg-blue-500', 'bg-orange-500', 'bg-emerald-500', 'bg-violet-500', 'bg-cyan-500', 'bg-zinc-400']
-              return sorted.map(([src, cnt], i) => (
-                <PipelineRow key={src} label={src} count={cnt} color={colors[i] ?? 'bg-zinc-400'} />
-              ))
-            })()}
+            <div style={{ fontSize: 26, fontWeight: 800, marginTop: 12, letterSpacing: '-.02em', color: '#fff', fontVariantNumeric: 'tabular-nums' }}>${(totalRevenue / 1000000).toFixed(2)}M</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,.82)', marginTop: 9 }}>{n(totalCount)} {t(lang, 'dash.kpi.revenue.sub')}</div>
           </div>
+        </a>
 
-          {/* Recent invoices */}
-          <div className="bg-white border border-zinc-200 rounded-xl p-5 lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-zinc-900">Facturas Recientes</h3>
-              <a href="/invoices" className="text-xs text-blue-600 hover:underline">Ver todas →</a>
+        <a href="/leads" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'linear-gradient(140deg,#12A39A,#0C746D 80%)', borderRadius: 'var(--radius)', padding: '17px 18px', boxShadow: 'var(--shadow)', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
+            <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 99, background: 'radial-gradient(closest-side,rgba(255,255,255,.16),transparent)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ color: 'rgba(255,255,255,.82)', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.5px' }}>{t(lang, 'dash.kpi.leads')}</span>
+              <div style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,.18)', display: 'grid', placeItems: 'center' }}><Users size={16} color="#fff" /></div>
             </div>
-            <div className="space-y-3">
-              {(recentInvoices ?? []).map((inv, i) => {
-                const isPaid = ['Fully Paid', 'Completed'].includes(inv.paid_status ?? '')
-                const isPartial = inv.paid_status === 'Partially Paid'
-                const Icon = isPaid ? CheckCircle : isPartial ? AlertCircle : Receipt
-                const color = isPaid ? 'text-emerald-500' : isPartial ? 'text-amber-500' : 'text-blue-500'
-                return (
-                  <div key={i} className="flex items-start gap-3">
-                    <Icon size={15} className={`${color} flex-shrink-0 mt-0.5`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-zinc-700 leading-snug">
-                        {inv.invoice_number} — {inv.customer_name} ·{' '}
-                        <span className="font-semibold">${Number(inv.total_sale || 0).toLocaleString()}</span>
-                      </p>
-                      <p className="text-xs text-zinc-400">{inv.salesman} · {inv.paid_status}</p>
-                    </div>
-                    <span className="text-xs text-zinc-400 whitespace-nowrap flex-shrink-0">
-                      {inv.invoice_date ? new Date(inv.invoice_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
+            <div style={{ fontSize: 26, fontWeight: 800, marginTop: 12, letterSpacing: '-.02em', color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{n(totalLeads)}</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,.82)', marginTop: 9 }}>{t(lang, 'dash.kpi.leads.sub')}</div>
           </div>
-        </div>
+        </a>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { href: '/leads', label: 'Ver Leads', color: 'bg-violet-50 hover:bg-violet-100 text-violet-700 border-violet-200' },
-            { href: '/customers', label: 'Ver Clientes', color: 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200' },
-            { href: '/invoices', label: 'Ver Facturas', color: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200' },
-            { href: '/products', label: 'Ver Productos', color: 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200' },
-          ].map(({ href, label, color }) => (
-            <a key={href} href={href} className={`border rounded-xl px-4 py-3 text-sm font-semibold text-center transition-colors ${color}`}>
-              {label}
-            </a>
-          ))}
+        <a href="/invoices?status=Fully+Paid" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: '17px 18px', boxShadow: 'var(--shadow)', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.5px' }}>{t(lang, 'dash.kpi.paid')}</span>
+              <div style={{ width: 30, height: 30, borderRadius: 9, background: 'var(--brand-50)', display: 'grid', placeItems: 'center' }}><FileText size={16} color="var(--brand)" /></div>
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 800, marginTop: 12, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{n(paidCount)}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 9 }}>{t(lang, 'dash.kpi.paid.sub', { total: n(totalCount) })}</div>
+          </div>
+        </a>
+
+        <a href="/invoices" style={{ textDecoration: 'none' }}>
+          <div style={{ background: totalBalance > 50000 ? 'var(--red-50)' : 'var(--card)', border: `1px solid ${totalBalance > 50000 ? '#FEE2E2' : 'var(--line)'}`, borderRadius: 'var(--radius)', padding: '17px 18px', boxShadow: 'var(--shadow)', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ color: totalBalance > 50000 ? 'var(--red-700)' : 'var(--muted)', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.5px' }}>{t(lang, 'dash.kpi.balance')}</span>
+              <div style={{ width: 30, height: 30, borderRadius: 9, background: totalBalance > 50000 ? '#FEE2E2' : 'var(--brand-50)', display: 'grid', placeItems: 'center' }}><Receipt size={16} color={totalBalance > 50000 ? 'var(--red-700)' : 'var(--brand)'} /></div>
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 800, marginTop: 12, letterSpacing: '-.02em', color: totalBalance > 50000 ? 'var(--red-700)' : 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>${(totalBalance / 1000).toFixed(0)}k</div>
+            <div style={{ fontSize: 12, color: totalBalance > 50000 ? 'var(--red-700)' : 'var(--muted)', marginTop: 9 }}>{t(lang, 'dash.kpi.balance.sub', { count: n(partialCount) })}</div>
+          </div>
+        </a>
+      </div>
+
+      {/* Charts */}
+      <DashboardCharts monthlyData={monthlyData} sourcesData={sourcesData} />
+
+      {/* Recent invoices */}
+      <div style={{ background: 'var(--card)', borderRadius: 'var(--radius)', padding: '18px 20px', boxShadow: 'var(--shadow)', border: '1px solid var(--line)', marginTop: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>{t(lang, 'dash.recent')}</h3>
+          <a href="/invoices" style={{ fontSize: 11.5, color: 'var(--brand)', fontWeight: 600, textDecoration: 'none' }}>{t(lang, 'dash.recent.all')}</a>
         </div>
-      </main>
-    </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {(recentInvoices ?? []).map((inv, i) => {
+            const isPaid = ['Fully Paid', 'Completed'].includes(inv.paid_status ?? '')
+            const isPartial = inv.paid_status === 'Partially Paid'
+            const Icon = isPaid ? CheckCircle : isPartial ? AlertCircle : Receipt
+            const color = isPaid ? 'var(--green-700)' : isPartial ? 'var(--amber-700)' : 'var(--brand)'
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--canvas-2)', borderRadius: 'var(--radius-sm)' }}>
+                <Icon size={15} style={{ color, flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.4, margin: 0 }}>
+                    <b style={{ color: 'var(--ink)', fontWeight: 600 }}>{inv.invoice_number}</b>
+                    {' — '}{inv.customer_name} · <b style={{ fontWeight: 700 }}>{money(inv.total_sale)}</b>
+                  </p>
+                  <p style={{ fontSize: 11.5, color: 'var(--faint)', marginTop: 2, margin: 0 }}>{inv.salesman} · {inv.paid_status}</p>
+                </div>
+                <span style={{ fontSize: 11.5, color: 'var(--faint)', whiteSpace: 'nowrap', flexShrink: 0 }}>{fmtDate(inv.invoice_date)}</span>
+                <a href={`/invoices/${inv.invoice_number}`} style={{ fontSize: 12, color: 'var(--brand)', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>{t(lang, 'common.view')}</a>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Quick nav */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginTop: 16 }}>
+        {[
+          {
+            href: '/leads', labelKey: 'nav.leads' as const, cta: t(lang, 'common.viewall'),
+            bg: 'var(--brand-50)', color: 'var(--brand-700)', border: 'var(--brand-50)',
+            stat: n(totalLeads), statLabel: t(lang, 'dash.nav.leads.sub'),
+          },
+          {
+            href: '/customers', labelKey: 'nav.customers' as const, cta: t(lang, 'common.viewall'),
+            bg: '#EFF6FF', color: '#1D4ED8', border: '#DBEAFE',
+            stat: '11,432', statLabel: t(lang, 'dash.nav.customers.sub'),
+          },
+          {
+            href: '/invoices', labelKey: 'nav.invoices' as const, cta: t(lang, 'common.viewall'),
+            bg: 'var(--green-50)', color: 'var(--green-700)', border: '#BBF7D0',
+            stat: n(totalCount), statLabel: t(lang, 'dash.nav.invoices.sub', { paid: n(paidCount) }),
+          },
+          {
+            href: '/products', labelKey: 'nav.products' as const, cta: t(lang, 'common.viewall'),
+            bg: 'var(--amber-50)', color: 'var(--amber-700)', border: '#FDE68A',
+            stat: '405', statLabel: t(lang, 'dash.nav.products.sub'),
+          },
+        ].map(({ href, labelKey, cta, bg, color, border, stat, statLabel }) => (
+          <a key={href} href={href} style={{ border: `1px solid ${border}`, background: bg, borderRadius: 'var(--radius)', padding: '16px 18px', textDecoration: 'none', display: 'block', transition: 'box-shadow .15s' }}>
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.5px', color }}>{t(lang, labelKey)}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-.02em', color, marginTop: 10, fontVariantNumeric: 'tabular-nums' }}>{stat}</div>
+            <div style={{ fontSize: 12, color, opacity: .75, marginTop: 6 }}>{statLabel}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color, marginTop: 12, display: 'flex', alignItems: 'center', gap: 4 }}>{cta}</div>
+          </a>
+        ))}
+      </div>
+    </>
   )
 }

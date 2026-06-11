@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Search } from 'lucide-react'
+import { useLang } from '@/contexts/LanguageContext'
 
 interface TopbarProps {
   title: string
@@ -8,26 +8,60 @@ interface TopbarProps {
 }
 
 export default function Topbar({ title, subtitle }: TopbarProps) {
+  const { lang, setLang } = useLang()
+
   return (
-    <header className="h-[60px] border-b border-zinc-200 bg-white flex items-center px-6 gap-4 flex-shrink-0">
-      {/* Breadcrumb */}
-      <div className="flex-1 min-w-0">
-        <h1 className="text-base font-semibold text-zinc-900 truncate">{title}</h1>
-        {subtitle && <p className="text-xs text-zinc-500 truncate">{subtitle}</p>}
+    <header style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 16,
+      marginBottom: 24,
+      flexWrap: 'wrap',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-.02em', color: 'var(--ink)' }}>
+            {title}
+          </h1>
+          {subtitle && (
+            <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 1 }}>{subtitle}</p>
+          )}
+        </div>
       </div>
 
-      {/* Search */}
-      <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-100 rounded-lg text-sm text-zinc-500 cursor-pointer hover:bg-zinc-200 transition-colors min-w-[220px]">
-        <Search size={14} className="flex-shrink-0" />
-        <span className="flex-1">Buscar leads, clientes, facturas…</span>
-        <kbd className="text-[10px] bg-white border border-zinc-200 rounded px-1.5 py-0.5 font-mono text-zinc-400">⌘K</kbd>
+      {/* Language toggle */}
+      <div style={{
+        display: 'inline-flex',
+        border: '1px solid var(--line)',
+        borderRadius: 8,
+        overflow: 'hidden',
+        boxShadow: 'var(--shadow-sm)',
+        flexShrink: 0,
+      }}>
+        {(['es', 'en'] as const).map((l, i) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            style={{
+              padding: '6px 14px',
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: '.4px',
+              border: 0,
+              borderLeft: i > 0 ? '1px solid var(--line)' : 0,
+              background: lang === l ? 'var(--brand)' : 'var(--card)',
+              color: lang === l ? '#fff' : 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'background .15s, color .15s',
+              textTransform: 'uppercase',
+            }}
+          >
+            {l}
+          </button>
+        ))}
       </div>
-
-      {/* Notifications */}
-      <button className="relative w-9 h-9 rounded-lg flex items-center justify-center text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition-colors">
-        <Bell size={17} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-      </button>
     </header>
   )
 }

@@ -1,15 +1,36 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/layout/Sidebar'
+import { signOut } from '@/app/login/actions'
+import { LanguageProvider } from '@/contexts/LanguageContext'
 
-const MOCK_USER = { name: 'Marco Baeza', email: 'marco@aromazhome.com', role: 'admin' }
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+  if (!user) redirect('/login')
+
+  const sessionUser = {
+    name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'Usuario',
+    email: user.email ?? '',
+    role: user.user_metadata?.role ?? 'admin',
+  }
+
   return (
-    <div className="flex h-full">
-      <Sidebar user={MOCK_USER} />
-      {/* Main content — offset by sidebar width + gap */}
-      <div className="flex flex-col flex-1 min-w-0 ml-[calc(240px+10px)] transition-all duration-200">
-        {children}
+    <LanguageProvider>
+      <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <Sidebar user={sessionUser} onSignOut={signOut} />
+        <main style={{
+          marginLeft: 272,
+          flex: 1,
+          padding: '24px 30px 64px',
+          transition: 'margin-left .22s cubic-bezier(.4,0,.2,1)',
+          minWidth: 0,
+          background: 'var(--bg)',
+        }}>
+          {children}
+        </main>
       </div>
-    </div>
+    </LanguageProvider>
   )
 }
