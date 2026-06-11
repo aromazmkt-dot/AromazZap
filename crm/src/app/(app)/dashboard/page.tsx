@@ -19,67 +19,89 @@ const STATUS_DOT: Record<string, string> = {
 }
 
 function KpiCard({
-  label, value, sub, accent, icon: Icon, href, progress,
+  label, value, sub, color, icon: Icon, href, progress,
 }: {
-  label: string; value: string; sub: string; accent: string
+  label: string; value: string; sub: string; color: string
   icon: React.ElementType; href: string; progress?: number
 }) {
   return (
-    <a href={href} style={{ textDecoration: 'none', display: 'block' }}>
+    <a href={href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
       <div style={{
-        background: accent,
-        borderRadius: 20,
+        background: 'var(--card)',
+        borderRadius: 18,
         padding: '20px 22px',
         height: '100%',
         position: 'relative',
         overflow: 'hidden',
         cursor: 'pointer',
+        border: '1px solid var(--line)',
+        boxShadow: 'var(--shadow)',
         transition: 'transform .15s, box-shadow .15s',
+        boxSizing: 'border-box',
       }}
         className="kpi-card-hover"
       >
-        {/* Noise texture overlay */}
+        {/* Colored top stripe */}
         <div style={{
-          position: 'absolute', inset: 0, borderRadius: 20,
-          background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'.04\'/%3E%3C/svg%3E")',
-          pointerEvents: 'none',
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: 3, background: color, borderRadius: '18px 18px 0 0',
         }} />
 
-        {/* Glow orb */}
-        <div style={{
-          position: 'absolute', right: -40, top: -40,
-          width: 160, height: 160, borderRadius: '50%',
-          background: 'radial-gradient(closest-side, rgba(255,255,255,.12), transparent)',
-          pointerEvents: 'none',
-        }} />
-
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.7)' }}>
+        <div style={{ marginTop: 6 }}>
+          {/* Icon + label row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 11, flexShrink: 0,
+              background: `${color}18`, display: 'grid', placeItems: 'center',
+              border: `1px solid ${color}28`,
+            }}>
+              <Icon size={16} color={color} />
+            </div>
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '.06em',
+              textTransform: 'uppercase', color: 'var(--muted)',
+            }}>
               {label}
             </span>
-            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,255,255,.15)', display: 'grid', placeItems: 'center' }}>
-              <Icon size={15} color="rgba(255,255,255,.9)" />
-            </div>
           </div>
 
-          <div style={{ fontSize: 30, fontWeight: 900, color: '#fff', letterSpacing: '-.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+          {/* Value */}
+          <div style={{
+            fontSize: 32, fontWeight: 900, color: 'var(--ink)',
+            letterSpacing: '-.04em', lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
             {value}
           </div>
 
+          {/* Sub + arrow */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-            <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,.7)', fontWeight: 500 }}>{sub}</span>
-            <ArrowUpRight size={14} color="rgba(255,255,255,.5)" />
+            <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500 }}>{sub}</span>
+            <div style={{
+              width: 24, height: 24, borderRadius: 8,
+              background: `${color}12`, display: 'grid', placeItems: 'center',
+            }}>
+              <ArrowUpRight size={13} color={color} />
+            </div>
           </div>
 
+          {/* Progress bar */}
           {progress !== undefined && (
             <div style={{ marginTop: 14 }}>
-              <div style={{ height: 4, background: 'rgba(255,255,255,.15)', borderRadius: 99, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.min(100, progress)}%`, background: 'rgba(255,255,255,.7)', borderRadius: 99, transition: 'width .5s ease' }} />
+              <div style={{ height: 5, background: `${color}18`, borderRadius: 99, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', width: `${Math.min(100, progress)}%`,
+                  background: color, borderRadius: 99, transition: 'width .5s ease',
+                }} />
               </div>
-              <span style={{ fontSize: 10.5, color: 'rgba(255,255,255,.6)', marginTop: 4, display: 'block' }}>
-                {progress.toFixed(0)}% completado
-              </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}>
+                <span style={{ fontSize: 10.5, color: 'var(--muted)', fontWeight: 600 }}>
+                  {progress.toFixed(0)}% cobradas
+                </span>
+                <span style={{ fontSize: 10.5, color, fontWeight: 700 }}>
+                  {progress.toFixed(0)}%
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -166,7 +188,7 @@ export default async function DashboardPage() {
           label={t(lang, 'dash.kpi.revenue')}
           value={`$${(totalRevenue / 1_000_000).toFixed(2)}M`}
           sub={`${n(totalCount)} ${t(lang, 'dash.kpi.revenue.sub')}`}
-          accent="linear-gradient(145deg, #1a6eb5 0%, #1244a0 60%, #0e3278 100%)"
+          color="#1E7FCC"
           icon={TrendingUp}
         />
         <KpiCard
@@ -174,7 +196,7 @@ export default async function DashboardPage() {
           label={t(lang, 'dash.kpi.leads')}
           value={n(totalLeads)}
           sub={t(lang, 'dash.kpi.leads.sub')}
-          accent="linear-gradient(145deg, #0d9488 0%, #0a7a70 60%, #065e57 100%)"
+          color="#0D9488"
           icon={Users}
         />
         <KpiCard
@@ -182,7 +204,7 @@ export default async function DashboardPage() {
           label={t(lang, 'dash.kpi.paid')}
           value={n(paidCount)}
           sub={t(lang, 'dash.kpi.paid.sub', { total: n(totalCount) })}
-          accent="linear-gradient(145deg, #16a34a 0%, #127a38 60%, #0d5c2a 100%)"
+          color="#16A34A"
           icon={CheckCircle2}
           progress={paidPct}
         />
@@ -191,9 +213,7 @@ export default async function DashboardPage() {
           label={t(lang, 'dash.kpi.balance')}
           value={`$${(totalBalance / 1_000).toFixed(0)}k`}
           sub={t(lang, 'dash.kpi.balance.sub', { count: n(Number(stats.partial_count)) })}
-          accent={totalBalance > 50_000
-            ? 'linear-gradient(145deg, #dc2626 0%, #b91c1c 60%, #921515 100%)'
-            : 'linear-gradient(145deg, #475569 0%, #334155 60%, #1e293b 100%)'}
+          color={totalBalance > 50_000 ? '#DC2626' : '#64748B'}
           icon={AlertCircle}
         />
       </div>
@@ -304,7 +324,7 @@ export default async function DashboardPage() {
           0%, 100% { box-shadow: 0 0 0 3px #dcfce7; }
           50% { box-shadow: 0 0 0 5px #bbf7d0; }
         }
-        .kpi-card-hover:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -12px rgba(0,0,0,.25); }
+        .kpi-card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -8px rgba(0,0,0,.12); }
         .table-row-hover:hover { background: #F8FAFF !important; }
       `}</style>
     </>
