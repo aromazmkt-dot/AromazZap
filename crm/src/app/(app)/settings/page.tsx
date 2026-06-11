@@ -1,5 +1,6 @@
 import Topbar from '@/components/layout/Topbar'
 import { User, Bell, Shield, Database, Palette } from 'lucide-react'
+import MFAClient from './MFAClient'
 
 function SettingsSection({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (
@@ -139,10 +140,8 @@ export default function SettingsPage() {
 
           {/* Security */}
           <SettingsSection icon={Shield} title="Seguridad">
-            <SettingsRow label="Autenticación de dos factores" sub="Agrega una capa extra de seguridad a tu cuenta">
-              <Toggle enabled={false} />
-            </SettingsRow>
-            <div className="px-5 py-4">
+            <MFAClient />
+            <div className="px-5 py-4 border-t border-zinc-100">
               <button className="px-4 py-2 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
                 Cambiar contraseña
               </button>
