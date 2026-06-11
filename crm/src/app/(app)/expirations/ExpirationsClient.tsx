@@ -359,7 +359,7 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
       <Topbar title={t('exp.title')} subtitle={`${n(obligations.length)} · ${n(critical)} ${t('exp.filter.critical').toLowerCase()}`} />
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
+      <div className="kpi-grid">
         {[
           { label: t('exp.kpi.critical'), value: n(critical), sub: t('exp.kpi.critical.sub'), danger: critical > 0 },
           { label: t('exp.kpi.upcoming'), value: n(upcoming), sub: t('exp.kpi.upcoming.sub'), warn: upcoming > 0 },
@@ -405,7 +405,7 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
       </div>
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+      <div className="toolbar-row" style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 220, maxWidth: 380 }}>
           <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--faint)', pointerEvents: 'none' }} />
           <input value={q} onChange={e => setQ(e.target.value)} placeholder={t('exp.search')}
@@ -437,7 +437,7 @@ export default function ExpirationsClient({ obligations: initial }: { obligation
 
       {/* Table */}
       <div style={{ background: 'var(--card)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', border: '1px solid var(--line)', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto', maxHeight: 'calc(100vh - 400px)', overflowY: 'auto' }}>
+        <div className="table-scroll" style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>

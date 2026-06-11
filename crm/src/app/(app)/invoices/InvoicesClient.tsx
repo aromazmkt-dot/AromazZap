@@ -90,7 +90,7 @@ export default function InvoicesClient({ invoices, stats }: { invoices: Invoice[
       <Topbar title="Facturas" subtitle={`${n(stats.totalCount)} registros · Datos reales`} />
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 16 }}>
+      <div className="kpi-grid">
         {[
           { label: 'Revenue Total', value: `$${(stats.totalRevenue / 1000000).toFixed(2)}M`, sub: `${n(stats.totalCount)} facturas históricas`, accent: true },
           { label: 'Pagadas', value: n(stats.paidCount), sub: `de ${n(stats.totalCount)} totales`, color: 'var(--green-700)', bg: 'var(--green-50)' },
@@ -112,8 +112,8 @@ export default function InvoicesClient({ invoices, stats }: { invoices: Invoice[
       </div>
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 220, maxWidth: 400 }}>
+      <div className="toolbar-row" style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+        <div className="toolbar-search" style={{ position: 'relative', flex: 1, minWidth: 180, maxWidth: 400 }}>
           <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--faint)', pointerEvents: 'none' }} />
           <input value={q} onChange={e => { setQ(e.target.value); setPage(0) }}
             placeholder="Buscar número, cliente, vendedor…"
@@ -139,8 +139,8 @@ export default function InvoicesClient({ invoices, stats }: { invoices: Invoice[
 
       {/* Table */}
       <div style={{ background: 'var(--card)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', border: '1px solid var(--line)', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto', maxHeight: 'calc(100vh - 400px)', overflowY: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <div className="table-scroll" style={{ maxHeight: 'calc(100vh - 380px)', overflowY: 'auto' }}>
+          <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
                 <th style={thStyle}>Número</th>

@@ -67,7 +67,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPI cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 14, marginBottom: 20 }}>
+      <div className="kpi-grid" style={{ marginBottom: 20 }}>
         <a href="/invoices" style={{ textDecoration: 'none' }}>
           <div style={{ background: 'linear-gradient(140deg,#2A8BD8,var(--brand-700) 75%)', borderRadius: 'var(--radius)', padding: '17px 18px', boxShadow: 'var(--shadow)', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
             <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 99, background: 'radial-gradient(closest-side,rgba(255,255,255,.16),transparent)' }} />
@@ -149,7 +149,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick nav */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginTop: 16 }}>
+      <div className="nav-grid">
         {[
           {
             href: '/leads', labelKey: 'nav.leads' as const, cta: t(lang, 'common.viewall'),

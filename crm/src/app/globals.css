@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 :root {
   --brand: #1E7FCC;
   --brand-700: #155A91;
@@ -25,12 +26,14 @@
   --shadow-lg: 0 24px 60px -20px rgba(13,30,60,.28);
 
   --radius: 16px; --radius-sm: 11px; --radius-xs: 8px;
+
+  /* Sidebar width token — updated by JS when collapsed */
+  --sidebar-w: 272px;
 }
 
+/* ─── Base Reset ─────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
-
 html, body { height: 100%; }
-
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg);
@@ -40,14 +43,236 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb {
   background: var(--line-2);
   border-radius: 99px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--faint);
-  background-clip: padding-box;
+::-webkit-scrollbar-thumb:hover { background: var(--faint); background-clip: padding-box; }
+
+/* ─── Layout ─────────────────────────────────────────────────────────────────── */
+.app-main {
+  margin-left: var(--sidebar-w, 272px);
+  flex: 1;
+  padding: 24px 30px 64px;
+  transition: margin-left .22s cubic-bezier(.4,0,.2,1);
+  min-width: 0;
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ─── Mobile Sidebar Backdrop ────────────────────────────────────────────────── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,28,51,.55);
+  z-index: 19;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: fadeIn .18s ease;
+}
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+/* ─── Responsive Tables ──────────────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Subtle right fade to hint horizontal scroll */
+}
+.table-scroll table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* ─── Touch Targets ──────────────────────────────────────────────────────────── */
+button, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* ─── Responsive Grids ───────────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.kpi-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+/* ─── Mobile Navigation Bar (bottom) ────────────────────────────────────────── */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: var(--sb-2);
+  border-top: 1px solid rgba(255,255,255,.08);
+  z-index: 30;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  safe-area-inset-bottom: env(safe-area-inset-bottom);
+}
+.mobile-nav a, .mobile-nav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  color: var(--sb-muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .4px;
+  text-decoration: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 52px;
+  min-height: 44px;
+  justify-content: center;
+  transition: color .15s, background .15s;
+}
+.mobile-nav a.active, .mobile-nav button.active {
+  color: #fff;
+  background: rgba(30,127,204,.25);
+}
+.mobile-nav a:not(.active), .mobile-nav button:not(.active) {
+  opacity: .7;
+}
+
+/* ─── Topbar Mobile ──────────────────────────────────────────────────────────── */
+.topbar-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--card);
+  color: var(--ink-2);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ─── Breakpoint: Tablet ≤ 1024px ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .app-main {
+    padding: 20px 22px 72px;
+  }
+}
+
+/* ─── Breakpoint: Mobile ≤ 768px ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+  }
+
+  .app-main {
+    margin-left: 0 !important;
+    padding: 16px 14px 80px;
+  }
+
+  /* Show sidebar backdrop when open */
+  .sidebar-backdrop {
+    display: block;
+  }
+
+  /* Show hamburger in topbar */
+  .topbar-hamburger {
+    display: flex;
+  }
+
+  /* Show mobile bottom nav */
+  .mobile-nav {
+    display: flex;
+  }
+
+  /* Sidebar becomes full-screen drawer */
+  .app-sidebar {
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    width: 280px !important;
+    transform: translateX(-100%);
+    transition: transform .25s cubic-bezier(.4,0,.2,1) !important;
+    z-index: 20;
+  }
+  .app-sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 0 0 60px rgba(0,0,0,.4) !important;
+  }
+
+  /* KPI cards: 2 columns on mobile */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .kpi-grid > div {
+    padding: 14px 14px !important;
+  }
+  .kpi-grid > * > div:nth-child(3) {
+    font-size: 22px !important;
+  }
+  .kpi-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Nav grid: 2x2 */
+  .nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Tables: ensure scrollable */
+  .table-scroll {
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .table-scroll table {
+    min-width: 640px;
+    font-size: 12.5px;
+  }
+
+  /* Toolbar: stack search + filters */
+  .toolbar-row {
+    flex-wrap: wrap;
+  }
+  .toolbar-search {
+    min-width: 0 !important;
+    flex: 1 1 100%;
+  }
+
+  /* Reduce font sizes */
+  h1 { font-size: 18px !important; }
+  h2 { font-size: 16px !important; }
+  h3 { font-size: 13px !important; }
+}
+
+/* ─── Breakpoint: Small mobile ≤ 480px ────────────────────────────────────── */
+@media (max-width: 480px) {
+  .app-main {
+    padding: 14px 12px 80px;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
 }

@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/layout/Sidebar'
+import MobileNav from '@/components/layout/MobileNav'
 import { signOut } from '@/app/login/actions'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import { UIProvider } from '@/contexts/UIContext'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -18,19 +20,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <LanguageProvider>
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
-        <Sidebar user={sessionUser} onSignOut={signOut} />
-        <main style={{
-          marginLeft: 272,
-          flex: 1,
-          padding: '24px 30px 64px',
-          transition: 'margin-left .22s cubic-bezier(.4,0,.2,1)',
-          minWidth: 0,
-          background: 'var(--bg)',
-        }}>
-          {children}
-        </main>
-      </div>
+      <UIProvider>
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
+          <Sidebar user={sessionUser} onSignOut={signOut} />
+          <main className="app-main">
+            {children}
+          </main>
+          <MobileNav />
+        </div>
+      </UIProvider>
     </LanguageProvider>
   )
 }

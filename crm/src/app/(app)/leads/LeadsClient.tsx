@@ -120,8 +120,8 @@ export default function LeadsClient({ leads }: { leads: Lead[] }) {
       </div>
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 220, maxWidth: 400 }}>
+      <div className="toolbar-row" style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+        <div className="toolbar-search" style={{ position: 'relative', flex: 1, minWidth: 180, maxWidth: 400 }}>
           <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--faint)', pointerEvents: 'none' }} />
           <input
             value={q}
@@ -170,8 +170,8 @@ export default function LeadsClient({ leads }: { leads: Lead[] }) {
 
       {/* Table */}
       <div style={{ background: 'var(--card)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', border: '1px solid var(--line)', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto', maxHeight: 'calc(100vh - 320px)', overflowY: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <div className="table-scroll" style={{ maxHeight: 'calc(100vh - 320px)', overflowY: 'auto' }}>
+          <table style={{ width: '100%', minWidth: 640, borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
                 <th style={thStyle}>Nombre</th>
