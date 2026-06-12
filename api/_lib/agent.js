@@ -85,7 +85,7 @@ async function selectRows(table, { select = '*', order, limit = 100, offset = 0,
 }
 
 async function countRows(table) {
-  const response = await fetch(supabaseUrl(table, { select: 'id', limit: 1 }), {
+  const response = await fetch(supabaseUrl(table, { select: '*', limit: 1 }), {
     headers: supabaseHeaders({ prefer: 'count=exact' }),
   })
   const text = await response.text()
