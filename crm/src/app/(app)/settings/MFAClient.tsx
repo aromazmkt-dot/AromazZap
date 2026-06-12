@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useEffect, useMemo, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ShieldCheck, Smartphone, QrCode, Loader2, CheckCircle2, XCircle, Trash2 } from 'lucide-react'
 
@@ -16,14 +16,14 @@ export default function MFAClient() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     supabase.auth.mfa.listFactors().then(({ data }) => {
       const hasTOTP = (data?.totp?.length ?? 0) > 0 && data?.totp?.[0]?.status === 'verified'
       setEnrolled(hasTOTP)
     })
-  }, [])
+  }, [supabase])
 
   async function startEnroll() {
     setError(null)
