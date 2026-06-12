@@ -18,9 +18,29 @@ function requireAgentAuth(req, res) {
   return true
 }
 
+function requireActionApproval(req, res, dryRun) {
+  if (dryRun) return true
+  if (req.headers['x-aromaz-action-approval'] === 'APPROVED') return true
+  sendJson(res, 409, {
+    ok: false,
+    error: 'explicit_action_approval_required',
+    requiredHeader: 'X-Aromaz-Action-Approval: APPROVED',
+  })
+  return false
+}
+
 function requireGet(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('allow', 'GET')
+    sendJson(res, 405, { ok: false, error: 'method_not_allowed' })
+    return false
+  }
+  return true
+}
+
+function requirePost(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('allow', 'POST')
     sendJson(res, 405, { ok: false, error: 'method_not_allowed' })
     return false
   }
@@ -69,8 +89,15 @@ function parseCount(contentRange, fallback) {
   return match ? Number(match[1]) : fallback
 }
 
-async function selectRows(table, { select = '*', order, limit = 100, offset = 0, count = true } = {}) {
-  const params = { select, limit, offset }
+async function readJson(req) {
+  const chunks = []
+  for await (const chunk of req) chunks.push(chunk)
+  const raw = Buffer.concat(chunks).toString('utf8')
+  return raw ? JSON.parse(raw) : {}
+}
+
+async function selectRows(table, { select = '*', order, limit = 100, offset = 0, count = true, filters = {} } = {}) {
+  const params = { select, limit, offset, ...filters }
   if (order) params.order = order
   const response = await fetch(supabaseUrl(table, params), {
     headers: supabaseHeaders(count ? { prefer: 'count=exact' } : {}),
@@ -94,6 +121,18 @@ async function countRows(table) {
   return parseCount(response.headers.get('content-range'), 0)
 }
 
+async function updateRows(table, filters, values) {
+  const response = await fetch(supabaseUrl(table, { ...filters, select: '*' }), {
+    method: 'PATCH',
+    headers: supabaseHeaders({ prefer: 'return=representation' }),
+    body: JSON.stringify(values),
+  })
+  const text = await response.text()
+  const body = text ? JSON.parse(text) : null
+  if (!response.ok) throw new Error(body?.message || body?.error || response.statusText)
+  return Array.isArray(body) ? body : []
+}
+
 async function rpc(name, payload = {}) {
   const response = await fetch(supabaseUrl(`rpc/${name}`), {
     method: 'POST',
@@ -109,11 +148,15 @@ async function rpc(name, payload = {}) {
 module.exports = {
   countRows,
   envStatus,
+  readJson,
   readLimit,
   readOffset,
+  requireActionApproval,
   requireAgentAuth,
   requireGet,
+  requirePost,
   rpc,
   selectRows,
   sendJson,
+  updateRows,
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export type AgentAuthFailure = NextResponse<{ ok: false; error: string }>
+export type AgentAuthFailure = NextResponse<{ ok: false; error: string; requiredHeader?: string }>
 
 export function requireAgentAuth(request: NextRequest): AgentAuthFailure | null {
   const expected = process.env.AROMAZ_AGENT_API_KEY
@@ -21,6 +21,19 @@ export function requireAgentAuth(request: NextRequest): AgentAuthFailure | null 
   }
 
   return null
+}
+
+export function requireActionApproval(request: NextRequest, dryRun: boolean): AgentAuthFailure | null {
+  if (dryRun) return null
+  if (request.headers.get('x-aromaz-action-approval') === 'APPROVED') return null
+  return NextResponse.json(
+    {
+      ok: false,
+      error: 'explicit_action_approval_required',
+      requiredHeader: 'X-Aromaz-Action-Approval: APPROVED',
+    },
+    { status: 409 }
+  )
 }
 
 export function readLimit(request: NextRequest, fallback = 100, max = 500) {

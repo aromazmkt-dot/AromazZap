@@ -12,6 +12,15 @@ const endpoints = [
   'invoices',
 ]
 
+const actions = [
+  'lead.updateStatus',
+  'lead.assignOwner',
+  'product.updatePricing',
+  'product.updateVisibility',
+  'expiration.updateStatus',
+  'customer.updateStatus',
+]
+
 test('agent API exposes only bearer-protected read-only GET endpoints', () => {
   const authHelper = join(root, 'src/lib/agent/auth.ts')
   assert.equal(existsSync(authHelper), true, 'missing src/lib/agent/auth.ts')
@@ -43,4 +52,24 @@ test('root Vercel deployment exposes matching protected read-only functions', ()
     assert.match(source, /requireAgentAuth/, `${endpoint} must require agent auth`)
     assert.doesNotMatch(source, /req\.method\s*===\s*['"](POST|PUT|PATCH|DELETE)['"]/, `${endpoint} must not expose mutations`)
   }
+})
+
+test('operational action API is explicit, allowlisted, and approval gated', () => {
+  const rootAction = join(root, '..', 'api/agent/actions.js')
+  assert.equal(existsSync(rootAction), true, 'missing root action API')
+  const rootSource = readFileSync(rootAction, 'utf8')
+  assert.match(rootSource, /requireAgentAuth/, 'root action API must require auth')
+  assert.match(rootSource, /requireActionApproval/, 'root action API must require explicit action approval')
+  assert.match(rootSource, /dryRun/, 'root action API must support dryRun')
+  assert.doesNotMatch(rootSource, /delete\(/i, 'root action API must not expose deletes')
+  for (const action of actions) assert.match(rootSource, new RegExp(action.replace('.', '\\.')), `missing action ${action}`)
+
+  const crmAction = join(root, 'src/app/api/agent/actions/route.ts')
+  assert.equal(existsSync(crmAction), true, 'missing CRM action API')
+  const crmSource = readFileSync(crmAction, 'utf8')
+  assert.match(crmSource, /export\s+async\s+function\s+POST/, 'CRM action API must expose POST')
+  assert.match(crmSource, /requireAgentAuth/, 'CRM action API must require auth')
+  assert.match(crmSource, /requireActionApproval/, 'CRM action API must require explicit action approval')
+  assert.match(crmSource, /dryRun/, 'CRM action API must support dryRun')
+  assert.doesNotMatch(crmSource, /\.delete\(/i, 'CRM action API must not expose deletes')
 })
