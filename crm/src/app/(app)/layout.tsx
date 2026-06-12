@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/layout/Sidebar'
 import MobileNav from '@/components/layout/MobileNav'
+import AgentAssistantWidget from '@/components/agent/AgentAssistantWidget'
 import { signOut } from '@/app/login/actions'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { UIProvider } from '@/contexts/UIContext'
@@ -26,6 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <main className="app-main">
             {children}
           </main>
+          <AgentAssistantWidget />
           <MobileNav />
         </div>
       </UIProvider>

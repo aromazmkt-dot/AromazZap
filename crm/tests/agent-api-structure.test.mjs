@@ -73,3 +73,24 @@ test('operational action API is explicit, allowlisted, and approval gated', () =
   assert.match(crmSource, /dryRun/, 'CRM action API must support dryRun')
   assert.doesNotMatch(crmSource, /\.delete\(/i, 'CRM action API must not expose deletes')
 })
+
+test('platform includes embedded Agente Aromaz assistant surface', () => {
+  const staticPlatform = join(root, '..', 'index.html')
+  assert.equal(existsSync(staticPlatform), true, 'missing root static platform')
+  const staticSource = readFileSync(staticPlatform, 'utf8')
+  assert.match(staticSource, /agent-assistant/, 'static platform must render assistant widget')
+  assert.match(staticSource, /askAgent/, 'static platform must expose agent interaction handler')
+  assert.match(staticSource, /Vendedores detectados/, 'assistant must answer salespeople/vendor list queries')
+
+  const crmWidget = join(root, 'src/components/agent/AgentAssistantWidget.tsx')
+  assert.equal(existsSync(crmWidget), true, 'missing CRM assistant widget')
+  const widgetSource = readFileSync(crmWidget, 'utf8')
+  assert.match(widgetSource, /Agente Aromaz/, 'CRM widget must identify Agente Aromaz')
+  assert.match(widgetSource, /api\/agent\/chat/, 'CRM widget must call internal chat API')
+
+  const chatRoute = join(root, 'src/app/api/agent/chat/route.ts')
+  assert.equal(existsSync(chatRoute), true, 'missing CRM chat route')
+  const chatSource = readFileSync(chatRoute, 'utf8')
+  assert.match(chatSource, /createAdminClient/, 'chat route must run server-side with platform context')
+  assert.match(chatSource, /salesmen|vendedores/i, 'chat route must support seller list questions')
+})
