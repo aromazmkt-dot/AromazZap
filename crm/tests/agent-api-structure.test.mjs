@@ -74,6 +74,21 @@ test('operational action API is explicit, allowlisted, and approval gated', () =
   assert.doesNotMatch(crmSource, /\.delete\(/i, 'CRM action API must not expose deletes')
 })
 
+test('root Vercel deployment rewrites /crm to the static platform shell', () => {
+  const vercelConfig = join(root, '..', 'vercel.json')
+  assert.equal(existsSync(vercelConfig), true, 'missing root vercel.json')
+  const config = JSON.parse(readFileSync(vercelConfig, 'utf8'))
+  assert.ok(Array.isArray(config.rewrites), 'vercel.json must define rewrites')
+  assert.ok(
+    config.rewrites.some((rewrite) => rewrite.source === '/crm' && rewrite.destination === '/'),
+    'vercel.json must rewrite /crm to /',
+  )
+  assert.ok(
+    config.rewrites.some((rewrite) => rewrite.source === '/crm/:path*' && rewrite.destination === '/'),
+    'vercel.json must rewrite nested /crm paths to /',
+  )
+})
+
 test('platform includes embedded Agente Aromaz assistant surface', () => {
   const staticPlatform = join(root, '..', 'index.html')
   assert.equal(existsSync(staticPlatform), true, 'missing root static platform')
