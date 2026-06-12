@@ -103,38 +103,50 @@ export default function Sidebar({ user, onSignOut }: SidebarProps) {
       >
         {/* Glow overlay */}
         <div style={{
-          position: 'absolute', inset: '0 0 auto 0', height: 200,
-          background: 'radial-gradient(120% 80% at 20% 0%, rgba(30,127,204,.22), transparent 60%)',
+          position: 'absolute', inset: '0 0 auto 0', height: 220,
+          background: 'radial-gradient(130% 90% at 15% 0%, rgba(27,111,199,.28), transparent 65%)',
+          pointerEvents: 'none',
+        }} />
+        {/* Bottom glow */}
+        <div style={{
+          position: 'absolute', inset: 'auto 0 0 0', height: 120,
+          background: 'radial-gradient(100% 80% at 80% 100%, rgba(27,111,199,.12), transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        {/* Right edge highlight */}
+        <div style={{
+          position: 'absolute', top: 0, right: 0, bottom: 0, width: 1,
+          background: 'linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.04) 40%, transparent 100%)',
           pointerEvents: 'none',
         }} />
 
         {/* Brand */}
         <div style={{
-          padding: '16px 12px 14px',
-          borderBottom: '1px solid rgba(255,255,255,.06)',
+          padding: '20px 14px 18px',
+          borderBottom: '1px solid rgba(255,255,255,.07)',
           marginBottom: 4,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
-          minHeight: 64,
+          minHeight: 80,
           flexShrink: 0,
         }}>
           {!collapsed ? (
             <Image
               src="/logo-aromaz-blanco.png"
               alt="Aromaz Home"
-              width={120}
-              height={36}
-              style={{ objectFit: 'contain', width: 'auto', height: 36 }}
+              width={160}
+              height={52}
+              style={{ objectFit: 'contain', width: 'auto', height: 52 }}
               priority
             />
           ) : (
             <Image
               src="/isotipo-aromaz.png"
               alt="Aromaz"
-              width={34}
-              height={34}
+              width={42}
+              height={42}
               style={{ objectFit: 'contain' }}
               priority
             />

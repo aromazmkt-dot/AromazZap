@@ -2,11 +2,11 @@
 
 /* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 :root {
-  --brand: #1E7FCC;
-  --brand-700: #155A91;
-  --brand-900: #0C3556;
-  --brand-50: #EAF3FB;
-  --brand-100: #D3E6F7;
+  --brand: #1B6FC7;
+  --brand-700: #145299;
+  --brand-900: #0B3465;
+  --brand-50: #E8F1FB;
+  --brand-100: #CCE0F5;
 
   --red: #E11D24; --red-50: #FCEBEC; --red-700: #A0151A;
   --orange: #F37920;
@@ -14,16 +14,17 @@
   --green: #16A34A; --green-50: #E7F6EC; --green-700: #15803D;
   --teal: #0E8A82; --violet: #7C3AED;
 
-  --ink: #0E1A2B; --ink-2: #334155; --muted: #64748B; --faint: #94A3B8;
-  --line: #E7ECF3; --line-2: #DBE2EC;
-  --bg: #EEF1F7; --card: #FFFFFF; --canvas-2: #F6F8FC;
+  --ink: #0A1628; --ink-2: #2D3F55; --muted: #5E7289; --faint: #8EA3BA;
+  --line: #E3EAF3; --line-2: #D4DFEC;
+  --bg: #E8EDF5; --card: #FFFFFF; --canvas-2: #F3F6FB;
 
-  --sb-1: #0C2440; --sb-2: #0A1C33;
-  --sb-text: #A9C0DC; --sb-text-strong: #FFFFFF; --sb-muted: #6E89AC;
+  --sb-1: #0B2240; --sb-2: #091B32;
+  --sb-text: #A8BFD8; --sb-text-strong: #FFFFFF; --sb-muted: #6B87A8;
 
-  --shadow-sm: 0 1px 2px rgba(13,30,60,.05);
-  --shadow: 0 1px 2px rgba(13,30,60,.04), 0 12px 28px -14px rgba(13,30,60,.16);
-  --shadow-lg: 0 24px 60px -20px rgba(13,30,60,.28);
+  --shadow-sm: 0 1px 3px rgba(10,22,40,.06);
+  --shadow: 0 1px 3px rgba(10,22,40,.05), 0 8px 24px -10px rgba(10,22,40,.14);
+  --shadow-lg: 0 20px 56px -16px rgba(10,22,40,.26);
+  --shadow-card: 0 2px 4px rgba(10,22,40,.04), 0 8px 20px -8px rgba(10,22,40,.10);
 
   --radius: 16px; --radius-sm: 11px; --radius-xs: 8px;
 
@@ -35,12 +36,16 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--ink);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Subtle dot-grid background */
+  background-image: radial-gradient(circle, rgba(30,111,199,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
@@ -57,10 +62,9 @@ body {
 .app-main {
   margin-left: var(--sidebar-w, 272px);
   flex: 1;
-  padding: 24px 30px 64px;
+  padding: 28px 32px 64px;
   transition: margin-left .22s cubic-bezier(.4,0,.2,1);
   min-width: 0;
-  background: var(--bg);
   min-height: 100vh;
 }
 
