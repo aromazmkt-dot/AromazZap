@@ -44,34 +44,33 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
 
       {/* Language toggle */}
       <div style={{
-        display: 'inline-flex',
-        border: '1px solid var(--line)',
-        borderRadius: 8,
-        overflow: 'hidden',
-        boxShadow: 'var(--shadow-sm)',
-        flexShrink: 0,
+        display: 'inline-flex', alignItems: 'center', gap: 3,
+        background: 'var(--card)', border: '1px solid var(--line)',
+        borderRadius: 12, padding: 4,
+        boxShadow: 'var(--shadow-sm)', flexShrink: 0,
       }}>
-        {(['es', 'en'] as const).map((l, i) => (
+        {([
+          { code: 'es', flag: '🇨🇱', label: 'ES' },
+          { code: 'en', flag: '🇺🇸', label: 'EN' },
+        ] as const).map(({ code, flag, label }) => (
           <button
-            key={l}
-            onClick={() => setLang(l)}
+            key={code}
+            onClick={() => setLang(code)}
             style={{
-              padding: '7px 14px',
-              fontSize: 11.5,
-              fontWeight: 700,
-              letterSpacing: '.4px',
-              border: 0,
-              borderLeft: i > 0 ? '1px solid var(--line)' : 0,
-              background: lang === l ? 'var(--brand)' : 'var(--card)',
-              color: lang === l ? '#fff' : 'var(--muted)',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              transition: 'background .15s, color .15s',
-              textTransform: 'uppercase',
-              minHeight: 36,
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '6px 13px',
+              fontSize: 12, fontWeight: 700,
+              border: 0, borderRadius: 8,
+              background: lang === code ? 'var(--brand)' : 'transparent',
+              color: lang === code ? '#fff' : 'var(--muted)',
+              cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'all .15s',
+              boxShadow: lang === code ? '0 2px 8px -2px rgba(27,111,199,.4)' : 'none',
+              whiteSpace: 'nowrap',
             }}
           >
-            {l}
+            <span style={{ fontSize: 16, lineHeight: 1 }}>{flag}</span>
+            {label}
           </button>
         ))}
       </div>
