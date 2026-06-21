@@ -7,6 +7,7 @@ const root = process.cwd()
 const endpoints = [
   'health',
   'reports/dashboard',
+  'reports/inbox',
   'products',
   'leads',
   'invoices',
@@ -87,6 +88,24 @@ test('root Vercel deployment rewrites /crm to the static platform shell', () => 
     config.rewrites.some((rewrite) => rewrite.source === '/crm/:path*' && rewrite.destination === '/'),
     'vercel.json must rewrite nested /crm paths to /',
   )
+})
+
+test('platform exposes GM Inbox as the command center for pending AI reports', () => {
+  const inboxPage = join(root, 'src/app/(app)/inbox/page.tsx')
+  assert.equal(existsSync(inboxPage), true, 'missing GM Inbox page')
+  const pageSource = readFileSync(inboxPage, 'utf8')
+  assert.match(pageSource, /Inbox GM/, 'GM Inbox page must identify itself')
+  assert.match(pageSource, /Reportes IA pendientes/, 'GM Inbox must show pending AI reports')
+  assert.match(pageSource, /Cobranza crítica/, 'GM Inbox must include critical collections')
+  assert.match(pageSource, /require approval|aprobaci[oó]n/i, 'GM Inbox must make approval gate visible')
+
+  const sidebar = readFileSync(join(root, 'src/components/layout/Sidebar.tsx'), 'utf8')
+  assert.match(sidebar, /href:\s*'\/inbox'/, 'sidebar must link to GM Inbox')
+  assert.match(sidebar, /nav\.inbox/, 'sidebar must use a translated Inbox label')
+
+  const i18n = readFileSync(join(root, 'src/lib/i18n.ts'), 'utf8')
+  assert.match(i18n, /'nav\.inbox':\s*'Inbox GM'/, 'Spanish nav must include Inbox GM')
+  assert.match(i18n, /'nav\.inbox':\s*'GM Inbox'/, 'English nav must include GM Inbox')
 })
 
 test('platform includes embedded Agente Aromaz assistant surface', () => {

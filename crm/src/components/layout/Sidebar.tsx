@@ -8,7 +8,7 @@ import {
   Users, UserCheck, FileText, Receipt,
   Package, Settings, ChevronLeft, Menu, LogOut,
   BookOpen, ClipboardList, UsersRound, HardHat, CalendarClock,
-  TrendingUp,
+  TrendingUp, Inbox,
 } from 'lucide-react'
 import { useLang } from '@/contexts/LanguageContext'
 import { useUI } from '@/contexts/UIContext'
@@ -44,6 +44,7 @@ export default function Sidebar({ user, onSignOut }: SidebarProps) {
       key: 'nav.section.operation' as const,
       items: [
         { href: '/dashboard',  labelKey: 'nav.dashboard' as const,   icon: TrendingUp },
+        { href: '/inbox',      labelKey: 'nav.inbox' as const,       icon: Inbox },
         { href: '/leads',      labelKey: 'nav.leads' as const,       icon: Users },
         { href: '/customers',  labelKey: 'nav.customers' as const,   icon: UserCheck },
         { href: '/quotes',     labelKey: 'nav.quotes' as const,      icon: FileText },
